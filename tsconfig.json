@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "target": "es6",
+        "module": "commonjs",
+        "removeComments": false
+    },
+    "exclude": [
+        "node_modules",
+        "dist",
+        "test",
+        "sdk"
+    ]
+}

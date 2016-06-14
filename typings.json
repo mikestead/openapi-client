@@ -1,0 +1,11 @@
+{
+  "globalDependencies": {
+    "chalk": "registry:dt/chalk#0.4.0+20160317120654",
+    "commander": "registry:dt/commander#2.3.0+20160317120654",
+    "expect": "registry:dt/expect#1.13.4+20160316155526",
+    "isomorphic-fetch": "registry:dt/isomorphic-fetch#0.0.0+20160524142046",
+    "js-yaml": "registry:dt/js-yaml#3.5.2+20160316171810",
+    "mocha": "registry:dt/mocha#2.2.5+20160317120654",
+    "node": "registry:dt/node#6.0.0+20160613154055"
+  }
+}

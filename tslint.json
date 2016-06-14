@@ -1,0 +1,6 @@
+{
+    "rules": {
+      "semicolon": [true, "never"],
+      "variable-name": [true, "ban-keywords", "check-format"]
+    }
+}

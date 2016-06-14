@@ -1,0 +1,165 @@
+import spec from './spec'
+import {
+  OpenApiSpec,
+  OperationInfo,
+  OperationSecurity,
+  OperationParamGroups,
+  OperationRights,
+  OperationRightsInfo,
+  HttpMethod,
+  CollectionFormat,
+  ServiceRequest,
+  ServiceOptions
+} from '../types'
+
+let options: ServiceOptions = {}
+
+export function init(serviceOptions: ServiceOptions) {
+  options = serviceOptions
+}
+
+export function request<T>(op: OperationInfo, parameters?: OperationParamGroups): Promise<T> {
+  return acquireRghts(op, spec, options)
+    .then(rights => {
+      const req = buildRequest(op, parameters, rights)
+      return makeFetchRequest(req).then(res => res.json())
+    })
+}
+
+function acquireRghts(op: OperationInfo, spec: OpenApiSpec, options: ServiceOptions): Promise<OperationRights> {
+  if (op.security && options.getAuthorization) {
+    return op.security.reduce<Promise<OperationRights>>((promise, security) => {
+      return promise.then(rights => {
+        const securityDefinition = spec.securityDefinitions[security.id]
+        return options.getAuthorization(security, securityDefinition, op)
+               .then(auth => {
+                 rights[security.id] = auth
+                 return rights
+               })
+      })
+    }, Promise.resolve({}))
+  }
+  return Promise.resolve({})
+}
+
+function makeFetchRequest(req: ServiceRequest): Promise<IResponse> {
+  const fetchOptions = {
+    compress: true,
+    method: req.method,
+    headers: req.headers,
+    body: req.body ? JSON.stringify(req.body) : undefined
+  }
+  let promise = fetch(req.url, fetchOptions)
+  return promise
+}
+
+function buildRequest(op: OperationInfo, parameters: OperationParamGroups, rights: OperationRights): ServiceRequest {
+  let paramGroups = groupParams(op, parameters)
+  paramGroups = applyAuthorization(paramGroups, rights, spec)
+  const url = buildUrl(op, paramGroups, spec)
+  const headers = buildHeaders(op, paramGroups)
+  return {
+    method: op.method,
+    url,
+    headers,
+    body: parameters.body
+  }
+}
+
+function groupParams(op: OperationInfo, parameters: OperationParamGroups) {
+  return ['header', 'path', 'query', 'formData'].reduce((groups, name) => {
+    groups[name] = formatParamsGroup(groups[name])
+    return groups
+  }, parameters)
+}
+
+function formatParamsGroup(groups: OperationParamGroups) {
+  return Object.keys(groups || {}).reduce((g, name) => {
+    const param = groups[name]
+    if (param !== undefined) {
+      g[name] = formatParam(param)
+    }
+    return g
+  }, <any>{})
+}
+
+function formatParam(param: any): string {
+  if (param === undefined) return ''
+  else if (param instanceof Date) return param.toJSON()
+  else return param.toString()
+}
+
+function buildUrl(op: OperationInfo, parameters, spec: OpenApiSpec) {
+  const scheme = ~spec.schemes.indexOf('https') ? 'https' : spec.schemes[0]
+  let url = `${scheme}://${spec.host}${spec.basePath}${op.path}`
+  if (parameters.path) {
+    url = Object.keys(parameters.path)
+      .reduce((url, name) => url.replace(`{${name}}`, parameters.path[name]), url)
+  }
+  const query = createQueryString(parameters.query)
+  return url + query
+}
+
+function createQueryString(query) {
+  const names = Object.keys(query || {})
+  if (!names.length) return ''
+  return '?' + names.sort().map(name => {
+      const value = query[name]
+      if (!value) return name
+      else return `${name}=${encodeURIComponent(value)}`
+    }).join('&')
+}
+
+function buildHeaders(op: OperationInfo, parameters) {
+  const headers: any = {}
+  headers.Accept = (op.consumes || spec.consumes).join(', ')
+  let produces = 'application/json'
+  if (op.produces && op.produces.length) {
+    produces = op.produces[0]
+  } else if (spec.produces && spec.produces.length) {
+    produces = spec.produces[0]
+  }
+  headers['Content-Type'] = produces
+  return Object.assign(headers, parameters.header)
+}
+
+function applyAuthorization(req: any, rights: any, spec: OpenApiSpec) {
+  Object.keys(rights).forEach(name => {
+    const rightsInfo: OperationRightsInfo = rights[name]
+    const definition = spec.securityDefinitions[name]
+    switch (definition.type) {
+      case 'basic':
+        const creds = `${rightsInfo.username}:${rightsInfo.password}`
+        const token = (window && window.btoa)
+          ? window.btoa(creds)
+          : new Buffer(creds).toString('base64')
+        req.headers.Authorization = `Basic ${token}`
+        break
+      case 'oauth2':
+        req.headers.Authorization = `Authorization ${rightsInfo.token}`
+        break
+      case 'apiKey':
+        if (definition.in === 'header') {
+          req.headers[definition.name] = rightsInfo.apiKey
+        } else if (definition.in === 'query') {
+          req.query[definition.name] = rightsInfo.apiKey
+        } else {
+          throw new Error(`Api key must be in header or query not '${definition.in}'`)
+        }
+        break
+      default:
+        throw new Error(`Security definition type '${definition.type}' not supported`)
+    }
+  })
+  return req
+}
+
+const COLLECTION_DELIM = { csv: ',', multi: '&', pipes: '|', ssv: ' ', tsv: '\t' }
+
+export function formatArrayParam(array: any[], format: CollectionFormat, name: string) {
+  if (!array) return
+  if (format === 'multi') array = array.map(value => `${name}=${formatParam(value)}`)
+  const delim = COLLECTION_DELIM[format]
+  if (!delim) throw new Error(`Invalid collection format '${format}'`)
+  return array.map(formatParam).join(delim)
+}
