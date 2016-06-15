@@ -27,7 +27,7 @@ function renderHeader() {
 function renderDefinitions(spec: ApiSpec, options: ClientOptions): string[] {
   const isTs = (options.language === 'ts')
   const defs = spec.definitions || {}
-  const typeLines = []
+  const typeLines = [`namespace api {`]
   const docLines = []
   Object.keys(defs).forEach(name => {
     const def = defs[name]
@@ -37,6 +37,7 @@ function renderDefinitions(spec: ApiSpec, options: ClientOptions): string[] {
     join(docLines, renderTypeDoc(name, def))
   })
   join(typeLines, renderTsDefaultTypes())
+  typeLines.push('}')
   return typeLines.concat(docLines)
 }
 

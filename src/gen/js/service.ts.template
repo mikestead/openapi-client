@@ -1,24 +1,13 @@
+/// <reference path="../types.ts"/>
 import spec from './spec'
-import {
-  OpenApiSpec,
-  OperationInfo,
-  OperationSecurity,
-  OperationParamGroups,
-  OperationRights,
-  OperationRightsInfo,
-  HttpMethod,
-  CollectionFormat,
-  ServiceRequest,
-  ServiceOptions
-} from '../types'
 
-let options: ServiceOptions = {}
+let options: api.ServiceOptions = {}
 
-export function init(serviceOptions: ServiceOptions) {
+export function init(serviceOptions: api.ServiceOptions) {
   options = serviceOptions
 }
 
-export function request<T>(op: OperationInfo, parameters?: OperationParamGroups): Promise<T> {
+export function request<T>(op: api.OperationInfo, parameters?: api.OperationParamGroups): Promise<T> {
   return acquireRghts(op, spec, options)
     .then(rights => {
       const req = buildRequest(op, parameters, rights)
@@ -26,9 +15,9 @@ export function request<T>(op: OperationInfo, parameters?: OperationParamGroups)
     })
 }
 
-function acquireRghts(op: OperationInfo, spec: OpenApiSpec, options: ServiceOptions): Promise<OperationRights> {
+function acquireRghts(op: api.OperationInfo, spec: api.OpenApiSpec, options: api.ServiceOptions): Promise<api.OperationRights> {
   if (op.security && options.getAuthorization) {
-    return op.security.reduce<Promise<OperationRights>>((promise, security) => {
+    return op.security.reduce<Promise<api.OperationRights>>((promise, security) => {
       return promise.then(rights => {
         const securityDefinition = spec.securityDefinitions[security.id]
         return options.getAuthorization(security, securityDefinition, op)
@@ -42,7 +31,7 @@ function acquireRghts(op: OperationInfo, spec: OpenApiSpec, options: ServiceOpti
   return Promise.resolve({})
 }
 
-function makeFetchRequest(req: ServiceRequest): Promise<IResponse> {
+function makeFetchRequest(req: api.ServiceRequest): Promise<IResponse> {
   const fetchOptions = {
     compress: true,
     method: req.method,
@@ -53,7 +42,7 @@ function makeFetchRequest(req: ServiceRequest): Promise<IResponse> {
   return promise
 }
 
-function buildRequest(op: OperationInfo, parameters: OperationParamGroups, rights: OperationRights): ServiceRequest {
+function buildRequest(op: api.OperationInfo, parameters: api.OperationParamGroups, rights: api.OperationRights): api.ServiceRequest {
   let paramGroups = groupParams(op, parameters)
   paramGroups = applyAuthorization(paramGroups, rights, spec)
   const url = buildUrl(op, paramGroups, spec)
@@ -66,14 +55,14 @@ function buildRequest(op: OperationInfo, parameters: OperationParamGroups, right
   }
 }
 
-function groupParams(op: OperationInfo, parameters: OperationParamGroups) {
+function groupParams(op: api.OperationInfo, parameters: api.OperationParamGroups) {
   return ['header', 'path', 'query', 'formData'].reduce((groups, name) => {
     groups[name] = formatParamsGroup(groups[name])
     return groups
   }, parameters)
 }
 
-function formatParamsGroup(groups: OperationParamGroups) {
+function formatParamsGroup(groups: api.OperationParamGroups) {
   return Object.keys(groups || {}).reduce((g, name) => {
     const param = groups[name]
     if (param !== undefined) {
@@ -89,7 +78,7 @@ function formatParam(param: any): string {
   else return param.toString()
 }
 
-function buildUrl(op: OperationInfo, parameters, spec: OpenApiSpec) {
+function buildUrl(op: api.OperationInfo, parameters, spec: api.OpenApiSpec) {
   const scheme = ~spec.schemes.indexOf('https') ? 'https' : spec.schemes[0]
   let url = `${scheme}://${spec.host}${spec.basePath}${op.path}`
   if (parameters.path) {
@@ -110,7 +99,7 @@ function createQueryString(query) {
     }).join('&')
 }
 
-function buildHeaders(op: OperationInfo, parameters) {
+function buildHeaders(op: api.OperationInfo, parameters) {
   const headers: any = {}
   headers.Accept = (op.consumes || spec.consumes).join(', ')
   let produces = 'application/json'
@@ -123,9 +112,9 @@ function buildHeaders(op: OperationInfo, parameters) {
   return Object.assign(headers, parameters.header)
 }
 
-function applyAuthorization(req: any, rights: any, spec: OpenApiSpec) {
+function applyAuthorization(req: any, rights: any, spec: api.OpenApiSpec) {
   Object.keys(rights).forEach(name => {
-    const rightsInfo: OperationRightsInfo = rights[name]
+    const rightsInfo: api.OperationRightsInfo = rights[name]
     const definition = spec.securityDefinitions[name]
     switch (definition.type) {
       case 'basic':
@@ -156,7 +145,7 @@ function applyAuthorization(req: any, rights: any, spec: OpenApiSpec) {
 
 const COLLECTION_DELIM = { csv: ',', multi: '&', pipes: '|', ssv: ' ', tsv: '\t' }
 
-export function formatArrayParam(array: any[], format: CollectionFormat, name: string) {
+export function formatArrayParam(array: any[], format: api.CollectionFormat, name: string) {
   if (!array) return
   if (format === 'multi') array = array.map(value => `${name}=${formatParam(value)}`)
   const delim = COLLECTION_DELIM[format]

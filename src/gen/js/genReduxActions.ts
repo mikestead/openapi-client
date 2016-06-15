@@ -24,11 +24,12 @@ export function genReduxActionGroupFiles(spec: ApiSpec, operations: ApiOperation
 }
 
 function renderHeader(name: string, spec: ApiSpec, options: ClientOptions): string {
+  
   const code = `
+${options.language === 'ts' && spec.definitions ? '/// <reference path="../types.ts"/>': ''}
 /** @module action/${name} */
 // Auto-generated, edits will be overwritten
 import * as ${name} from '../${name}'
-${options.language === 'ts' && spec.definitions ? `import * as types from '../types'` : '' }
 `.trim()
   return code
 }

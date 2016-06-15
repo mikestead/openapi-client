@@ -29,12 +29,12 @@ export function genOperationGroupFiles(spec: ApiSpec, operations: ApiOperation[]
 
 function renderHeader(name: string, spec: ApiSpec, options: ClientOptions): string[] {
   const lines = []
+  if (spec.definitions) {
+    lines.push(`/// <reference path="types.ts"/>`)
+  }
   lines.push(`/** @module ${name} */`)
   lines.push(`// Auto-generated, edits will be overwritten`)
   lines.push(`import * as gateway from './gateway'`)
-  if (spec.definitions) {
-    lines.push(`import * as types from './types'`)
-  }
   lines.push('')
   return lines
 }
@@ -177,7 +177,7 @@ function renderOperationObject(spec: ApiSpec, op: ApiOperation, options: ClientO
   
   if (lines.length) {
     if (options.language === 'ts') {
-      lines.unshift(`${SP}const parameters: types.OperationParamGroups = {`)
+      lines.unshift(`${SP}const parameters: api.OperationParamGroups = {`)
     } else {
       lines.unshift(`${SP}const parameters = {`)
     }
@@ -242,7 +242,7 @@ function renderOperationParamType(spec: ApiSpec, op: ApiOperation, options: Clie
 function renderOperationInfo(spec: ApiSpec, op: ApiOperation, options: ClientOptions): string[] {
   const lines = []
   if (options.language === 'ts') {
-    lines.push(`const ${op.id}Operation: types.OperationInfo = {`)
+    lines.push(`const ${op.id}Operation: api.OperationInfo = {`)
   } else {
     lines.push(`const ${op.id}Operation = {`)
   }

@@ -21,10 +21,9 @@ function renderSpecView(spec: ApiSpec, options: ClientOptions): string {
     produces: spec.produces,
     securityDefinitions: spec.securityDefinitions
   }
-  const type = (options.language === 'ts') ?  ': OpenApiSpec' : ''
-  return `
+  const type = (options.language === 'ts') ?  ': api.OpenApiSpec' : ''
+  return `${options.language === 'ts' ? '/// <reference path="../types.ts"/>': ''}
 // Auto-generated, edits will be overwritten
-import { OpenApiSpec} from '../types'
 const spec${type} = ${stringify(view)}
 export default spec
 `

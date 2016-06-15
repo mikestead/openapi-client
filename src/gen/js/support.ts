@@ -40,7 +40,7 @@ export function getTSParamType(param: any, inTypesModule?: boolean): string {
     const type = param.$ref.split('/').pop()
     return inTypesModule 
       ? type
-      : `types.${type}`
+      : `api.${type}`
   } else if (param.schema) {
     return getTSParamType(param.schema, inTypesModule)
   } else if (param.type === 'array') {
@@ -54,7 +54,7 @@ export function getTSParamType(param: any, inTypesModule?: boolean): string {
       const type = param.items.$ref.split('/').pop()
       return inTypesModule 
         ? `${type}[]`
-        : `types.${type}[]`
+        : `api.${type}[]`
     } else {
       return 'any[]'
     }
