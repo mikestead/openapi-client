@@ -1,6 +1,6 @@
 {
   "name": "openapi-client",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Generate ES6 or TypeScript service integration code from an OpenAPI spec.",
   "author": {
     "name": "Mike Stead",
