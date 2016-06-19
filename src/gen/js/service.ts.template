@@ -79,7 +79,8 @@ function formatParam(param: any): string {
 }
 
 function buildUrl(op: api.OperationInfo, parameters, spec: api.OpenApiSpec) {
-  let url = `//${spec.host}${spec.basePath}${op.path}`
+  const base = options.url || `${spec.schemes[0] || 'https'}://${spec.host}${spec.basePath}`
+  let url = `${base}${op.path}`
   if (parameters.path) {
     url = Object.keys(parameters.path)
       .reduce((url, name) => url.replace(`{${name}}`, parameters.path[name]), url)

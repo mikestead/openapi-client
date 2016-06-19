@@ -152,6 +152,13 @@ export interface ServiceRequest {
 }
 
 export interface ServiceOptions {
+  /**
+   * The service url.
+   * 
+   * If not specified then defaults to the one defined in the Open API 
+   * spec used to generate the service api.
+   */
+  url?: string
   getAuthorization?: (security: OperationSecurity, securityDefinitions: any, op: OperationInfo) => Promise<OperationRights>
   formatServiceError?: (response: FetchResponse, data: any) => ServiceError
 }
