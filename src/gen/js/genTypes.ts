@@ -153,6 +153,7 @@ export interface ServiceRequest {
 
 export interface ServiceOptions {
   getAuthorization?: (security: OperationSecurity, securityDefinitions: any, op: OperationInfo) => Promise<OperationRights>
+  formatServiceError?: (response: FetchResponse, data: any) => ServiceError
 }
 
 export type OperationRights = {[key: string]: OperationRightsInfo}
@@ -162,6 +163,62 @@ export interface OperationRightsInfo {
   password?: string
   token?: string
   apiKey?: string
+}
+
+export interface Response<T> {
+  raw: FetchResponse
+  /**
+   * If 'error' is true then data will be of type ServiceError
+   */
+  data?: T
+  /**
+   * True if there was a service error, false if not
+   */
+  error?: boolean
+}
+
+export interface FetchResponse extends FetchBody {
+  url: string
+  status: number
+  statusText: string
+  ok: boolean
+  headers: IHeaders
+  type: string | FetchResponseType
+  size: number
+  timeout: number
+  redirect(url: string, status: number): FetchResponse
+  error(): FetchResponse
+  clone(): FetchResponse
+}
+
+export interface FetchBody {
+  bodyUsed: boolean
+  arrayBuffer(): Promise<ArrayBuffer>
+  blob(): Promise<Blob>
+  formData(): Promise<FormData>
+  json(): Promise<any>
+  json<T>(): Promise<T>
+  text(): Promise<string>
+}
+
+export interface FetchHeaders {
+  get(name: string): string
+  getAll(name: string): Array<string>
+  has(name: string): boolean
+}
+
+export declare enum FetchResponseType { 'basic', 'cors', 'default', 'error', 'opaque' }
+
+export class ServiceError extends Error {
+  status: number
+}
+
+/**
+ * Flux standard action meta for service action
+ */
+export interface ServiceMeta {
+  res: FetchResponse
+  info: any
 }
 `.split('\n')
 }

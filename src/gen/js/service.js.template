@@ -1,23 +1,22 @@
-/// <reference path="../types.ts"/>
 import spec from './spec'
 
-let options: api.ServiceOptions = {}
+let options = {}
 
-export function init(serviceOptions: api.ServiceOptions) {
+export function init(serviceOptions) {
   options = serviceOptions
 }
 
-export function request<T>(op: api.OperationInfo, parameters?: api.OperationParamGroups): Promise<T> {
+export function request(op, parameters) {
   return acquireRghts(op, spec, options)
     .then(rights => {
       const req = buildRequest(op, parameters, rights)
-      return makeFetchRequest(req).then((res => processResponse(<any>res, options)))
+      return makeFetchRequest(req).then((res => processResponse(res, options)))
     })
 }
 
-function acquireRghts(op: api.OperationInfo, spec: api.OpenApiSpec, options: api.ServiceOptions): Promise<api.OperationRights> {
+function acquireRghts(op, spec, options) {
   if (op.security && options.getAuthorization) {
-    return op.security.reduce<Promise<api.OperationRights>>((promise, security) => {
+    return op.security.reduce((promise, security) => {
       return promise.then(rights => {
         const securityDefinition = spec.securityDefinitions[security.id]
         return options.getAuthorization(security, securityDefinition, op)
@@ -31,7 +30,7 @@ function acquireRghts(op: api.OperationInfo, spec: api.OpenApiSpec, options: api
   return Promise.resolve({})
 }
 
-function makeFetchRequest(req: api.ServiceRequest): Promise<IResponse> {
+function makeFetchRequest(req) {
   const fetchOptions = {
     compress: true,
     method: req.method,
@@ -42,7 +41,7 @@ function makeFetchRequest(req: api.ServiceRequest): Promise<IResponse> {
   return promise
 }
 
-function buildRequest(op: api.OperationInfo, parameters: api.OperationParamGroups, rights: api.OperationRights): api.ServiceRequest {
+function buildRequest(op, parameters, rights) {
   let paramGroups = groupParams(op, parameters)
   paramGroups = applyAuthorization(paramGroups, rights, spec)
   const url = buildUrl(op, paramGroups, spec)
@@ -55,30 +54,30 @@ function buildRequest(op: api.OperationInfo, parameters: api.OperationParamGroup
   }
 }
 
-function groupParams(op: api.OperationInfo, parameters: api.OperationParamGroups) {
+function groupParams(op, parameters) {
   return ['header', 'path', 'query', 'formData'].reduce((groups, name) => {
     groups[name] = formatParamsGroup(groups[name])
     return groups
   }, parameters)
 }
 
-function formatParamsGroup(groups: api.OperationParamGroups) {
+function formatParamsGroup(groups) {
   return Object.keys(groups || {}).reduce((g, name) => {
     const param = groups[name]
     if (param !== undefined) {
       g[name] = formatParam(param)
     }
     return g
-  }, <any>{})
+  }, {})
 }
 
-function formatParam(param: any): string {
+function formatParam(param) {
   if (param === undefined) return ''
   else if (param instanceof Date) return param.toJSON()
   else return param.toString()
 }
 
-function buildUrl(op: api.OperationInfo, parameters, spec: api.OpenApiSpec) {
+function buildUrl(op, parameters, spec) {
   let url = `//${spec.host}${spec.basePath}${op.path}`
   if (parameters.path) {
     url = Object.keys(parameters.path)
@@ -98,8 +97,8 @@ function createQueryString(query) {
     }).join('&')
 }
 
-function buildHeaders(op: api.OperationInfo, parameters) {
-  const headers: any = {}
+function buildHeaders(op, parameters) {
+  const headers = {}
   headers.Accept = (op.consumes || spec.consumes).join(', ')
   let produces = 'application/json'
   if (op.produces && op.produces.length) {
@@ -111,9 +110,9 @@ function buildHeaders(op: api.OperationInfo, parameters) {
   return Object.assign(headers, parameters.header)
 }
 
-function applyAuthorization(req: any, rights: any, spec: api.OpenApiSpec) {
+function applyAuthorization(req, rights, spec) {
   Object.keys(rights).forEach(name => {
-    const rightsInfo: api.OperationRightsInfo = rights[name]
+    const rightsInfo = rights[name]
     const definition = spec.securityDefinitions[name]
     switch (definition.type) {
       case 'basic':
@@ -142,8 +141,8 @@ function applyAuthorization(req: any, rights: any, spec: api.OpenApiSpec) {
   return req
 }
 
-function processResponse(response: api.FetchResponse, options: api.ServiceOptions) {
-  const format: any = response.ok ? formatResponse : formatServiceError
+function processResponse(response, options) {
+  const format = response.ok ? formatResponse : formatServiceError
   const contentType = response.headers.get('content-type') || ''
 
   let parse
@@ -159,11 +158,11 @@ function processResponse(response: api.FetchResponse, options: api.ServiceOption
   return parse.then(data => format(response, data, options))
 }
 
-function formatResponse(response, data, options: api.ServiceOptions): api.Response<api.ServiceError> {
+function formatResponse(response, data, options) {
   return { raw: response, data }
 }
 
-function formatServiceError(response: api.FetchResponse, data, options: api.ServiceOptions): api.Response<api.ServiceError> {
+function formatServiceError(response, data, options) {
   if (options.formatServiceError) {
     data = options.formatServiceError(response, data)
   } else {
@@ -185,7 +184,7 @@ function formatServiceError(response: api.FetchResponse, data, options: api.Serv
 
 const COLLECTION_DELIM = { csv: ',', multi: '&', pipes: '|', ssv: ' ', tsv: '\t' }
 
-export function formatArrayParam(array: any[], format: api.CollectionFormat, name: string) {
+export function formatArrayParam(array, format, name) {
   if (!array) return
   if (format === 'multi') array = array.map(value => `${name}=${formatParam(value)}`)
   const delim = COLLECTION_DELIM[format]

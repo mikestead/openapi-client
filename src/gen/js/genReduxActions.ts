@@ -36,9 +36,12 @@ import * as ${name} from '../${name}'
 
 function renderReduxActionBlock(spec: ApiSpec, op: ApiOperation, options: ClientOptions): string {
   const lines = []
+  const isTs = options.language === 'ts'
   const actionStart = camelToUppercase(op.id) + '_START'
   const actionComplete = camelToUppercase(op.id)
-  const paramSignature = renderParamSignature(op, options, `${op.group}.`)
+  const infoParam = isTs ? 'info?: any' : 'info'
+  let paramSignature = renderParamSignature(op, options, `${op.group}.`)
+  paramSignature += `${paramSignature ? ', ' : ''}${infoParam}`
   const required = op.parameters.filter(param => param.required)
   let params = required.map(param => param.name).join(', ')
   if (required.length < op.parameters.length) {
@@ -48,20 +51,23 @@ function renderReduxActionBlock(spec: ApiSpec, op: ApiOperation, options: Client
 
   const response = getBestResponse(op)
   const returnType = response ? getTSParamType(response) : 'any'
-  const isTs = options.language === 'ts'
   return `
-export const ${actionStart} = '${op.group}/${op.id}Start'
-export const ${actionComplete} = '${op.group}/${op.id}'
+export const ${actionStart} = '${op.group}/${actionStart}'
+export const ${actionComplete} = '${op.group}/${actionComplete}'
 ${isTs ? `export type ${actionComplete} = ${returnType}`: ''}
 
 export function ${op.id}(${paramSignature})${isTs? ': any' : ''} {
   return dispatch => {
-    dispatch({ type: ${actionStart} })
+    dispatch({ type: ${actionStart}, meta: { info } })
     return ${op.group}.${op.id}(${params})
-      .then(payload => dispatch({
+      .then(response => dispatch({
         type: ${actionComplete},
-        payload,
-        error: payload instanceof Error
+        payload: response.data,
+        error: response.error,
+        meta: {
+          res: response.raw,
+          info
+        }
       }))
   }
 }
