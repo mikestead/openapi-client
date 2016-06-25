@@ -1,5 +1,29 @@
-export let SP = '  '
 export const DOC = ' * '
+export const DEFAULT_SP = '  '
+export let SP = DEFAULT_SP
+export let ST = '' // statement terminator
+
+export function applyFormatOptions(options: ClientOptions) {
+  switch (`${options.indent}`) {
+    case 'tab':
+    case '\t':
+      SP = '\t'
+      break
+    case '4':
+      SP = '    '
+      break
+    case '2':
+      SP = '  '
+      break
+    case 'spaces':
+    default:
+      SP = DEFAULT_SP
+      break
+  }
+  if (options.semicolon) {
+    ST = ';'
+  }
+}
 
 export function formatDocDescription(description: string): string {
   return (description || '').trim().replace(/\n/g, `\n${DOC}${SP}`)

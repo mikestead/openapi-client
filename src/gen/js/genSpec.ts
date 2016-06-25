@@ -1,3 +1,4 @@
+import { DOC, SP, ST, getDocType, getTSParamType } from './support'
 import { writeFileSync } from '../util'
 
 export default function genSpec(spec: ApiSpec, options: ClientOptions) {
@@ -24,12 +25,12 @@ function renderSpecView(spec: ApiSpec, options: ClientOptions): string {
   const type = (options.language === 'ts') ?  ': api.OpenApiSpec' : ''
   return `${options.language === 'ts' ? '/// <reference path="../types.ts"/>': ''}
 // Auto-generated, edits will be overwritten
-const spec${type} = ${stringify(view)}
-export default spec
+const spec${type} = ${stringify(view)}${ST}
+export default spec${ST}
 `
 }
 
 function stringify(view: any): string {
   const str = JSON.stringify(view, null, 2)
-  return str.replace(/"/g, `'`)
+  return str.replace(/"/g, `'`).replace(/  /g, SP)
 }

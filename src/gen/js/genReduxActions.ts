@@ -1,5 +1,5 @@
 import { writeFileSync, join, groupOperationsByGroupName, camelToUppercase, getBestResponse } from '../util'
-import { DOC, SP, getDocType, getTSParamType } from './support'
+import { DOC, SP, ST, getDocType, getTSParamType } from './support'
 import { renderParamSignature, renderOperationGroup } from './genOperations'
 
 export default function genReduxActions(spec: ApiSpec, operations: ApiOperation[], options: ClientOptions) {
@@ -29,7 +29,7 @@ function renderHeader(name: string, spec: ApiSpec, options: ClientOptions): stri
 ${options.language === 'ts' && spec.definitions ? '/// <reference path="../types.ts"/>': ''}
 /** @module action/${name} */
 // Auto-generated, edits will be overwritten
-import * as ${name} from '../${name}'
+import * as ${name} from '../${name}'${ST}
 `.trim()
   return code
 }
@@ -52,13 +52,13 @@ function renderReduxActionBlock(spec: ApiSpec, op: ApiOperation, options: Client
   const response = getBestResponse(op)
   const returnType = response ? getTSParamType(response) : 'any'
   return `
-export const ${actionStart} = '${op.group}/${actionStart}'
-export const ${actionComplete} = '${op.group}/${actionComplete}'
-${isTs ? `export type ${actionComplete} = ${returnType}`: ''}
+export const ${actionStart} = '${op.group}/${actionStart}'${ST}
+export const ${actionComplete} = '${op.group}/${actionComplete}'${ST}
+${isTs ? `export type ${actionComplete} = ${returnType}${ST}`: ''}
 
 export function ${op.id}(${paramSignature})${isTs? ': any' : ''} {
   return dispatch => {
-    dispatch({ type: ${actionStart}, meta: { info } })
+    dispatch({ type: ${actionStart}, meta: { info } })${ST}
     return ${op.group}.${op.id}(${params})
       .then(response => dispatch({
         type: ${actionComplete},
@@ -68,8 +68,8 @@ export function ${op.id}(${paramSignature})${isTs? ': any' : ''} {
           res: response.raw,
           info
         }
-      }))
-  }
+      }))${ST}
+  }${ST}
 }
-`
+`.replace(/  /g, SP)
 }
