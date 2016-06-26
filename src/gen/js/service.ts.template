@@ -1,6 +1,11 @@
 /// <reference path="../types.ts"/>
 import spec from './spec';;
 
+export class ServiceError extends Error implements api.ServiceError {
+	status: number;;
+	code: number;;
+}
+
 let options: api.ServiceOptions = {};;
 
 export function init(serviceOptions: api.ServiceOptions) {
@@ -10,7 +15,7 @@ export function init(serviceOptions: api.ServiceOptions) {
 export function request<T>(op: api.OperationInfo, parameters?: api.OperationParamGroups): Promise<T> {
 	return acquireRghts(op, spec, options)
 		.then(rights => {
-			const req = buildRequest(op, parameters, rights);;
+			const req = buildRequest(op, parameters || {}, rights);;
 			return makeFetchRequest(req).then((res => processResponse(<any>res, options)));;
 		});;
 }
@@ -51,15 +56,17 @@ function buildRequest(op: api.OperationInfo, parameters: api.OperationParamGroup
 		method: op.method,
 		url,
 		headers,
-		body: parameters.body
+		body: parameters.body && parameters.body.body
 	};;
 }
 
 function groupParams(op: api.OperationInfo, parameters: api.OperationParamGroups) {
-	return ['header', 'path', 'query', 'formData'].reduce((groups, name) => {
+	const groups = ['header', 'path', 'query', 'formData'].reduce((groups, name) => {
 		groups[name] = formatParamsGroup(groups[name]);;
 		return groups;;
 	}, parameters);;
+	if (!groups.header) groups.header = {};;
+	return groups;;
 }
 
 function formatParamsGroup(groups: api.OperationParamGroups) {
@@ -122,14 +129,14 @@ function applyAuthorization(req: any, rights: any, spec: api.OpenApiSpec) {
 				const token = (window && window.btoa)
 					? window.btoa(creds)
 					: new Buffer(creds).toString('base64');;
-				req.headers.Authorization = `Basic ${token}`;;
+				req.header.Authorization = `Basic ${token}`;;
 				break;;
 			case 'oauth2':
-				req.headers.Authorization = `Authorization ${rightsInfo.token}`;;
+				req.header.Authorization = `Bearer ${rightsInfo.token}`;;
 				break;;
 			case 'apiKey':
 				if (definition.in === 'header') {
-					req.headers[definition.name] = rightsInfo.apiKey;;
+					req.header[definition.name] = rightsInfo.apiKey;;
 				} else if (definition.in === 'query') {
 					req.query[definition.name] = rightsInfo.apiKey;;
 				} else {
@@ -168,7 +175,7 @@ function formatServiceError(response: api.FetchResponse, data, options: api.Serv
 	if (options.formatServiceError) {
 		data = options.formatServiceError(response, data);;
 	} else {
-		const serviceError = new api.ServiceError();;
+		const serviceError = new ServiceError();;
 		if (data) {
 			if (typeof data === 'string') serviceError.message = data;;
 			else if (data.message) serviceError.message = data.message;;

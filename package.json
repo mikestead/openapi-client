@@ -30,7 +30,9 @@
     "dev": "tsc -w",
     "init": "npm run clean && npm run copy:template",
     "clean": "shx rm -rf ./dist",
-    "copy:template": "shx mkdir -p ./dist/gen/js && shx cp ./src/gen/js/service.ts.template ./dist/gen/js/service.ts.template"
+    "copy:template": "shx mkdir -p ./dist/gen/js && npm run copy:service-ts && npm run copy:service-js",
+    "copy:service-ts": "shx cp ./src/gen/js/service.ts.template ./dist/gen/js/service.ts.template",
+    "copy:service-js": "shx cp ./src/gen/js/service.js.template ./dist/gen/js/service.js.template"
   },
   "files": [
     "dist"

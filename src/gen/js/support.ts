@@ -48,6 +48,8 @@ export function getDocType(param: any): string {
     }
   } else if (param.type === 'integer') {
     return 'number'
+  } else if (param.type === 'string' && (param.format === 'date-time' || param.format === 'date')) {
+    return 'date'
   } else {
     return param.type || 'object'
   }
@@ -90,6 +92,8 @@ export function getTSParamType(param: any, inTypesModule?: boolean): string {
     return 'any'
   } else if (param.type === 'integer') {
     return 'number'
+  } else if (param.type === 'string' && (param.format === 'date-time' || param.format === 'date')) {
+    return 'Date'
   }
   else {
     return param.type || 'any'
