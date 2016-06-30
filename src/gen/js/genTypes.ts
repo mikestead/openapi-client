@@ -161,6 +161,7 @@ export interface ServiceOptions {
   url?: string${ST}
   getAuthorization?: (security: OperationSecurity, securityDefinitions: any, op: OperationInfo) => Promise<OperationRights>${ST}
   formatServiceError?: (response: FetchResponse, data: any) => ServiceError${ST}
+  processParameters?: (op: OperationInfo, parameters: OperationParamGroups) => OperationParamGroups${ST}
 }
 
 export type OperationRights = {[key: string]: OperationRightsInfo}${ST}

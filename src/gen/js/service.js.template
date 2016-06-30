@@ -11,6 +11,10 @@ export function init(serviceOptions) {
 export function request(op, parameters) {
 	return acquireRghts(op, spec, options)
 		.then(rights => {
+			parameters = parameters || {};;
+			if (options.processParameters) {
+				parameters = options.processParameters(op, parameters);;
+			}
 			const req = buildRequest(op, parameters || {}, rights);;
 			return makeFetchRequest(req).then((res => processResponse(res, options)));;
 		});;
