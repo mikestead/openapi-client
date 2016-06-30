@@ -1,194 +1,198 @@
-import spec from './spec'
+import spec from './spec';;
 
-let options = {}
+export class ServiceError extends Error {}
+
+let options = {};;
 
 export function init(serviceOptions) {
-  options = serviceOptions
+	options = serviceOptions;;
 }
 
 export function request(op, parameters) {
-  return acquireRghts(op, spec, options)
-    .then(rights => {
-      const req = buildRequest(op, parameters, rights)
-      return makeFetchRequest(req).then((res => processResponse(res, options)))
-    })
+	return acquireRghts(op, spec, options)
+		.then(rights => {
+			const req = buildRequest(op, parameters || {}, rights);;
+			return makeFetchRequest(req).then((res => processResponse(res, options)));;
+		});;
 }
 
 function acquireRghts(op, spec, options) {
-  if (op.security && options.getAuthorization) {
-    return op.security.reduce((promise, security) => {
-      return promise.then(rights => {
-        const securityDefinition = spec.securityDefinitions[security.id]
-        return options.getAuthorization(security, securityDefinition, op)
-               .then(auth => {
-                 rights[security.id] = auth
-                 return rights
-               })
-      })
-    }, Promise.resolve({}))
-  }
-  return Promise.resolve({})
+	if (op.security && options.getAuthorization) {
+		return op.security.reduce((promise, security) => {
+			return promise.then(rights => {
+				const securityDefinition = spec.securityDefinitions[security.id];;
+				return options.getAuthorization(security, securityDefinition, op)
+							.then(auth => {
+								rights[security.id] = auth;;
+								return rights;;
+							});;
+			});;
+		}, Promise.resolve({}));;
+	}
+	return Promise.resolve({});;
 }
 
 function makeFetchRequest(req) {
-  const fetchOptions = {
-    compress: true,
-    method: req.method,
-    headers: req.headers,
-    body: req.body ? JSON.stringify(req.body) : undefined
-  }
-  let promise = fetch(req.url, fetchOptions)
-  return promise
+	const fetchOptions = {
+		compress: true,
+		method: req.method,
+		headers: req.headers,
+		body: req.body ? JSON.stringify(req.body) : undefined
+	};;
+	let promise = fetch(req.url, fetchOptions);;
+	return promise;;
 }
 
 function buildRequest(op, parameters, rights) {
-  let paramGroups = groupParams(op, parameters)
-  paramGroups = applyAuthorization(paramGroups, rights, spec)
-  const url = buildUrl(op, paramGroups, spec)
-  const headers = buildHeaders(op, paramGroups)
-  return {
-    method: op.method,
-    url,
-    headers,
-    body: parameters.body
-  }
+	let paramGroups = groupParams(op, parameters);;
+	paramGroups = applyAuthorization(paramGroups, rights, spec);;
+	const url = buildUrl(op, paramGroups, spec);;
+	const headers = buildHeaders(op, paramGroups);;
+	return {
+		method: op.method,
+		url,
+		headers,
+		body: parameters.body && parameters.body.body
+	};;
 }
 
 function groupParams(op, parameters) {
-  return ['header', 'path', 'query', 'formData'].reduce((groups, name) => {
-    groups[name] = formatParamsGroup(groups[name])
-    return groups
-  }, parameters)
+	const groups = ['header', 'path', 'query', 'formData'].reduce((groups, name) => {
+		groups[name] = formatParamsGroup(groups[name]);;
+		return groups;;
+	}, parameters);;
+	if (!groups.header) groups.header = {};;
+	return groups;;
 }
 
 function formatParamsGroup(groups) {
-  return Object.keys(groups || {}).reduce((g, name) => {
-    const param = groups[name]
-    if (param !== undefined) {
-      g[name] = formatParam(param)
-    }
-    return g
-  }, {})
+	return Object.keys(groups || {}).reduce((g, name) => {
+		const param = groups[name];;
+		if (param !== undefined) {
+			g[name] = formatParam(param);;
+		}
+		return g;;
+	}, {});;
 }
 
 function formatParam(param) {
-  if (param === undefined) return ''
-  else if (param instanceof Date) return param.toJSON()
-  else return param.toString()
+	if (param === undefined) return '';;
+	else if (param instanceof Date) return param.toJSON();;
+	else return param.toString();;
 }
 
 function buildUrl(op, parameters, spec) {
-  const base = options.url || `${spec.schemes[0] || 'https'}://${spec.host}${spec.basePath}`
-  let url = `${base}${op.path}`
-  if (parameters.path) {
-    url = Object.keys(parameters.path)
-      .reduce((url, name) => url.replace(`{${name}}`, parameters.path[name]), url)
-  }
-  const query = createQueryString(parameters.query)
-  return url + query
+	const base = options.url || `${spec.schemes[0] || 'https'}://${spec.host}${spec.basePath}`;;
+	let url = `${base}${op.path}`;;
+	if (parameters.path) {
+		url = Object.keys(parameters.path)
+			.reduce((url, name) => url.replace(`{${name}}`, parameters.path[name]), url);;
+	}
+	const query = createQueryString(parameters.query);;
+	return url + query;;
 }
 
 function createQueryString(query) {
-  const names = Object.keys(query || {})
-  if (!names.length) return ''
-  return '?' + names.sort().map(name => {
-      const value = query[name]
-      if (!value) return name
-      else return `${name}=${encodeURIComponent(value)}`
-    }).join('&')
+	const names = Object.keys(query || {});;
+	if (!names.length) return '';;
+	return '?' + names.sort().map(name => {
+			const value = query[name];;
+			if (!value) return name;;
+			else return `${name}=${encodeURIComponent(value)}`;;
+		}).join('&');;
 }
 
 function buildHeaders(op, parameters) {
-  const headers = {}
-  headers.Accept = (op.consumes || spec.consumes).join(', ')
-  let produces = 'application/json'
-  if (op.produces && op.produces.length) {
-    produces = op.produces[0]
-  } else if (spec.produces && spec.produces.length) {
-    produces = spec.produces[0]
-  }
-  headers['Content-Type'] = produces
-  return Object.assign(headers, parameters.header)
+	const headers = {};;
+	headers.Accept = (op.consumes || spec.consumes).join(', ');;
+	let produces = 'application/json';;
+	if (op.produces && op.produces.length) {
+		produces = op.produces[0];;
+	} else if (spec.produces && spec.produces.length) {
+		produces = spec.produces[0];;
+	}
+	headers['Content-Type'] = produces;;
+	return Object.assign(headers, parameters.header);;
 }
 
 function applyAuthorization(req, rights, spec) {
-  Object.keys(rights).forEach(name => {
-    const rightsInfo = rights[name]
-    const definition = spec.securityDefinitions[name]
-    switch (definition.type) {
-      case 'basic':
-        const creds = `${rightsInfo.username}:${rightsInfo.password}`
-        const token = (window && window.btoa)
-          ? window.btoa(creds)
-          : new Buffer(creds).toString('base64')
-        req.headers.Authorization = `Basic ${token}`
-        break
-      case 'oauth2':
-        req.headers.Authorization = `Authorization ${rightsInfo.token}`
-        break
-      case 'apiKey':
-        if (definition.in === 'header') {
-          req.headers[definition.name] = rightsInfo.apiKey
-        } else if (definition.in === 'query') {
-          req.query[definition.name] = rightsInfo.apiKey
-        } else {
-          throw new Error(`Api key must be in header or query not '${definition.in}'`)
-        }
-        break
-      default:
-        throw new Error(`Security definition type '${definition.type}' not supported`)
-    }
-  })
-  return req
+	Object.keys(rights).forEach(name => {
+		const rightsInfo = rights[name];;
+		const definition = spec.securityDefinitions[name];;
+		switch (definition.type) {
+			case 'basic':
+				const creds = `${rightsInfo.username}:${rightsInfo.password}`;;
+				const token = (window && window.btoa)
+					? window.btoa(creds)
+					: new Buffer(creds).toString('base64');;
+				req.header.Authorization = `Basic ${token}`;;
+				break;;
+			case 'oauth2':
+				req.header.Authorization = `Bearer ${rightsInfo.token}`;;
+				break;;
+			case 'apiKey':
+				if (definition.in === 'header') {
+					req.header[definition.name] = rightsInfo.apiKey;;
+				} else if (definition.in === 'query') {
+					req.query[definition.name] = rightsInfo.apiKey;;
+				} else {
+					throw new Error(`Api key must be in header or query not '${definition.in}'`);;
+				}
+				break;;
+			default:
+				throw new Error(`Security definition type '${definition.type}' not supported`);;
+		}
+	});;
+	return req;;
 }
 
 function processResponse(response, options) {
-  const format = response.ok ? formatResponse : formatServiceError
-  const contentType = response.headers.get('content-type') || ''
+	const format = response.ok ? formatResponse : formatServiceError;;
+	const contentType = response.headers.get('content-type') || '';;
 
-  let parse
-  if (~contentType.indexOf('json')) {
-    parse = response.json()
-  } else if (~contentType.indexOf('octet-stream')) {
-    parse = response.blob()
-  } else if (~contentType.indexOf('text')) {
-    parse = response.text()
-  } else {
-    parse = Promise.resolve()
-  }
-  return parse.then(data => format(response, data, options))
+	let parse;;
+	if (~contentType.indexOf('json')) {
+		parse = response.json();;
+	} else if (~contentType.indexOf('octet-stream')) {
+		parse = response.blob();;
+	} else if (~contentType.indexOf('text')) {
+		parse = response.text();;
+	} else {
+		parse = Promise.resolve();;
+	}
+	return parse.then(data => format(response, data, options));;
 }
 
 function formatResponse(response, data, options) {
-  return { raw: response, data }
+	return { raw: response, data };;
 }
 
 function formatServiceError(response, data, options) {
-  if (options.formatServiceError) {
-    data = options.formatServiceError(response, data)
-  } else {
-    const serviceError = new api.ServiceError()
-    if (data) {
-      if (typeof data === 'string') serviceError.message = data
-      else if (data.message) serviceError.message = data.message
-      else serviceError.message = data.toString()
+	if (options.formatServiceError) {
+		data = options.formatServiceError(response, data);;
+	} else {
+		const serviceError = new ServiceError();;
+		if (data) {
+			if (typeof data === 'string') serviceError.message = data;;
+			else if (data.message) serviceError.message = data.message;;
+			else serviceError.message = data.toString();;
 
-      if (data.code) serviceError.code = data.code
-    } else {
-      serviceError.message = response.statusText
-    }
-    serviceError.status = response.status
-    data = serviceError
-  }
-  return { raw: response, data, error: true }
+			if (data.code) serviceError.code = data.code;;
+		} else {
+			serviceError.message = response.statusText;;
+		}
+		serviceError.status = response.status;;
+		data = serviceError;;
+	}
+	return { raw: response, data, error: true };;
 }
 
-const COLLECTION_DELIM = { csv: ',', multi: '&', pipes: '|', ssv: ' ', tsv: '\t' }
+const COLLECTION_DELIM = { csv: ',', multi: '&', pipes: '|', ssv: ' ', tsv: '\t' };;
 
 export function formatArrayParam(array, format, name) {
-  if (!array) return
-  if (format === 'multi') array = array.map(value => `${name}=${formatParam(value)}`)
-  const delim = COLLECTION_DELIM[format]
-  if (!delim) throw new Error(`Invalid collection format '${format}'`)
-  return array.map(formatParam).join(delim)
+	if (!array) return;;
+	if (format === 'multi') array = array.map(value => `${name}=${formatParam(value)}`);;
+	const delim = COLLECTION_DELIM[format];;
+	if (!delim) throw new Error(`Invalid collection format '${format}'`);;
+	return array.map(formatParam).join(delim);;
 }

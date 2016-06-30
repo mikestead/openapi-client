@@ -1,5 +1,29 @@
-export let SP = '  '
 export const DOC = ' * '
+export const DEFAULT_SP = '  '
+export let SP = DEFAULT_SP
+export let ST = '' // statement terminator
+
+export function applyFormatOptions(options: ClientOptions) {
+  switch (`${options.indent}`) {
+    case 'tab':
+    case '\t':
+      SP = '\t'
+      break
+    case '4':
+      SP = '    '
+      break
+    case '2':
+      SP = '  '
+      break
+    case 'spaces':
+    default:
+      SP = DEFAULT_SP
+      break
+  }
+  if (options.semicolon) {
+    ST = ';'
+  }
+}
 
 export function formatDocDescription(description: string): string {
   return (description || '').trim().replace(/\n/g, `\n${DOC}${SP}`)
@@ -24,6 +48,8 @@ export function getDocType(param: any): string {
     }
   } else if (param.type === 'integer') {
     return 'number'
+  } else if (param.type === 'string' && (param.format === 'date-time' || param.format === 'date')) {
+    return 'date'
   } else {
     return param.type || 'object'
   }
@@ -66,6 +92,8 @@ export function getTSParamType(param: any, inTypesModule?: boolean): string {
     return 'any'
   } else if (param.type === 'integer') {
     return 'number'
+  } else if (param.type === 'string' && (param.format === 'date-time' || param.format === 'date')) {
+    return 'Date'
   }
   else {
     return param.type || 'any'

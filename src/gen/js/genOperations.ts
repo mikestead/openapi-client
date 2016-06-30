@@ -1,5 +1,5 @@
 import { writeFileSync, join, groupOperationsByGroupName, camelToUppercase, getBestResponse } from '../util'
-import { DOC, SP, getDocType, getTSParamType } from './support'
+import { DOC, SP, ST, getDocType, getTSParamType } from './support'
 
 export default function genOperations(spec: ApiSpec, operations: ApiOperation[], options: ClientOptions) {
   const files = genOperationGroupFiles(spec, operations, options)
@@ -34,7 +34,7 @@ function renderHeader(name: string, spec: ApiSpec, options: ClientOptions): stri
   }
   lines.push(`/** @module ${name} */`)
   lines.push(`// Auto-generated, edits will be overwritten`)
-  lines.push(`import * as gateway from './gateway'`)
+  lines.push(`import * as gateway from './gateway'${ST}`)
   lines.push('')
   return lines
 }
@@ -181,9 +181,9 @@ function renderOperationObject(spec: ApiSpec, op: ApiOperation, options: ClientO
     } else {
       lines.unshift(`${SP}const parameters = {`)
     }
-    lines.push(`${SP}}`)
+    lines.push(`${SP}}${ST}`)
     const hasOptionals = op.parameters.some(op => !op.required)
-    if (hasOptionals) lines.unshift(`${SP}if (!options) options = {}`)
+    if (hasOptionals) lines.unshift(`${SP}if (!options) options = {}${ST}`)
   }
   return lines
 }
@@ -217,7 +217,7 @@ function renderParamGroup(name: string, groupLines: string[], last: boolean): st
 
 function renderRequestCall(op: ApiOperation, options: ClientOptions) {
   const params = op.parameters.length ? ', parameters': '' 
-  return [ `${SP}return gateway.request(${op.id}Operation${params})`, '}' ]
+  return [ `${SP}return gateway.request(${op.id}Operation${params})${ST}`, '}' ]
 }
 
 function renderOperationParamType(spec: ApiSpec, op: ApiOperation, options: ClientOptions): string[] {
@@ -231,7 +231,7 @@ function renderOperationParamType(spec: ApiSpec, op: ApiOperation, options: Clie
       lines.push(`${SP}${DOC}` + (param.description || '').trim().replace(/\n/g, `\n${SP}${DOC}${SP}`))
       lines.push(`${SP} */`)
     }
-    lines.push(`${SP}${getParamName(param.name)}?: ${getTSParamType(param)}`)
+    lines.push(`${SP}${getParamName(param.name)}?: ${getTSParamType(param)}${ST}`)
   })
   lines.push('}')
   lines.push('')
@@ -254,7 +254,7 @@ function renderOperationInfo(spec: ApiSpec, op: ApiOperation, options: ClientOpt
     join(lines, secLines)
     lines.push(`${SP}]`)
   }
-  lines.push('}')
+  lines.push(`}${ST}`)
   lines.push('')
   return lines
 }

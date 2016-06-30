@@ -1,5 +1,5 @@
 import { writeFileSync, join } from '../util'
-import { DOC, SP, getDocType, getTSParamType, formatDocDescription } from './support'
+import { DOC, SP, ST, getDocType, getTSParamType, formatDocDescription } from './support'
 
 export default function genTypes(spec: ApiSpec, options: ClientOptions) {
   const file = genTypesFile(spec, options)
@@ -95,60 +95,60 @@ function renderTsTypeProp(prop: string, info: any, required: boolean): string[] 
     lines.push(`${SP} */`)
   }
   const req = required ? '' : '?'
-  lines.push(`${SP}${prop}${req}: ${type}`)
+  lines.push(`${SP}${prop}${req}: ${type}${ST}`)
   return lines
 }
 
 function renderTsDefaultTypes() {
   return `export interface OpenApiSpec {
-  host: string
-  basePath: string
-  schemes: string[]
-  consumes: string[]
-  produces: string[]
-  securityDefinitions?: {[key: string]: SecurityDefinition}
+  host: string${ST}
+  basePath: string${ST}
+  schemes: string[]${ST}
+  consumes: string[]${ST}
+  produces: string[]${ST}
+  securityDefinitions?: {[key: string]: SecurityDefinition}${ST}
 }
 
 export interface SecurityDefinition {
-  type: 'basic'|'apiKey'|'oauth2'
-  description?: string
-  name?: string
-  in?: 'query'|'header'
-  flow?: 'implicit'|'password'|'application'|'accessCode'
-  authorizationUrl?: string
-  tokenUrl?: string
-  scopes?: {[key: string]: string}
+  type: 'basic'|'apiKey'|'oauth2'${ST}
+  description?: string${ST}
+  name?: string${ST}
+  in?: 'query'|'header'${ST}
+  flow?: 'implicit'|'password'|'application'|'accessCode'${ST}
+  authorizationUrl?: string${ST}
+  tokenUrl?: string${ST}
+  scopes?: {[key: string]: string}${ST}
 }
 
-export type CollectionFormat = 'csv'|'ssv'|'tsv'|'pipes'|'multi'
-export type HttpMethod = 'get'|'put'|'post'|'delete'|'options'|'head'|'patch'
+export type CollectionFormat = 'csv'|'ssv'|'tsv'|'pipes'|'multi'${ST}
+export type HttpMethod = 'get'|'put'|'post'|'delete'|'options'|'head'|'patch'${ST}
 
 export interface OperationInfo {
-  path: string
-  method: HttpMethod
-  security?: OperationSecurity[]
-  consumes?: string[]
-  produces?: string[]
+  path: string${ST}
+  method: HttpMethod${ST}
+  security?: OperationSecurity[]${ST}
+  consumes?: string[]${ST}
+  produces?: string[]${ST}
 }
 
 export interface OperationSecurity {
-  id: string
-  scopes?: string[]
+  id: string${ST}
+  scopes?: string[]${ST}
 }
 
 export interface OperationParamGroups {
-  header?: {[key: string]: string}
-  path?: {[key: string]: string|number}
-  query?: {[key: string]: string|number}
-  formData?: {[key: string]: string|number}
-  body?: any
+  header?: {[key: string]: string}${ST}
+  path?: {[key: string]: string|number}${ST}
+  query?: {[key: string]: string|number}${ST}
+  formData?: {[key: string]: string|number}${ST}
+  body?: any${ST}
 }
 
 export interface ServiceRequest {
-  method: HttpMethod
-  url: string
-  headers: { [index: string]: string }
-  body: any
+  method: HttpMethod${ST}
+  url: string${ST}
+  headers: { [index: string]: string }${ST}
+  body: any${ST}
 }
 
 export interface ServiceOptions {
@@ -158,76 +158,76 @@ export interface ServiceOptions {
    * If not specified then defaults to the one defined in the Open API 
    * spec used to generate the service api.
    */
-  url?: string
-  getAuthorization?: (security: OperationSecurity, securityDefinitions: any, op: OperationInfo) => Promise<OperationRights>
-  formatServiceError?: (response: FetchResponse, data: any) => ServiceError
+  url?: string${ST}
+  getAuthorization?: (security: OperationSecurity, securityDefinitions: any, op: OperationInfo) => Promise<OperationRights>${ST}
+  formatServiceError?: (response: FetchResponse, data: any) => ServiceError${ST}
 }
 
-export type OperationRights = {[key: string]: OperationRightsInfo}
+export type OperationRights = {[key: string]: OperationRightsInfo}${ST}
 
 export interface OperationRightsInfo {
-  username?: string
-  password?: string
-  token?: string
-  apiKey?: string
+  username?: string${ST}
+  password?: string${ST}
+  token?: string${ST}
+  apiKey?: string${ST}
 }
 
 export interface Response<T> {
-  raw: FetchResponse
+  raw: FetchResponse${ST}
   /**
    * If 'error' is true then data will be of type ServiceError
    */
-  data?: T
+  data?: T${ST}
   /**
    * True if there was a service error, false if not
    */
-  error?: boolean
+  error?: boolean${ST}
 }
 
 export interface FetchResponse extends FetchBody {
-  url: string
-  status: number
-  statusText: string
-  ok: boolean
-  headers: IHeaders
-  type: string | FetchResponseType
-  size: number
-  timeout: number
-  redirect(url: string, status: number): FetchResponse
-  error(): FetchResponse
-  clone(): FetchResponse
+  url: string${ST}
+  status: number${ST}
+  statusText: string${ST}
+  ok: boolean${ST}
+  headers: IHeaders${ST}
+  type: string | FetchResponseType${ST}
+  size: number${ST}
+  timeout: number${ST}
+  redirect(url: string, status: number): FetchResponse${ST}
+  error(): FetchResponse${ST}
+  clone(): FetchResponse${ST}
 }
 
 export interface FetchBody {
-  bodyUsed: boolean
-  arrayBuffer(): Promise<ArrayBuffer>
-  blob(): Promise<Blob>
-  formData(): Promise<FormData>
-  json(): Promise<any>
-  json<T>(): Promise<T>
-  text(): Promise<string>
+  bodyUsed: boolean${ST}
+  arrayBuffer(): Promise<ArrayBuffer>${ST}
+  blob(): Promise<Blob>${ST}
+  formData(): Promise<FormData>${ST}
+  json(): Promise<any>${ST}
+  json<T>(): Promise<T>${ST}
+  text(): Promise<string>${ST}
 }
 
 export interface FetchHeaders {
-  get(name: string): string
-  getAll(name: string): Array<string>
-  has(name: string): boolean
+  get(name: string): string${ST}
+  getAll(name: string): Array<string>${ST}
+  has(name: string): boolean${ST}
 }
 
-export declare enum FetchResponseType { 'basic', 'cors', 'default', 'error', 'opaque' }
+export declare enum FetchResponseType { 'basic', 'cors', 'default', 'error', 'opaque' }${ST}
 
 export class ServiceError extends Error {
-  status: number
+  status: number${ST}
 }
 
 /**
  * Flux standard action meta for service action
  */
 export interface ServiceMeta {
-  res: FetchResponse
-  info: any
+  res: FetchResponse${ST}
+  info: any${ST}
 }
-`.split('\n')
+`.replace(/  /g, SP).split('\n')
 }
 
 

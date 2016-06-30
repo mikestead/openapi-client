@@ -10,6 +10,8 @@ const args: any = program
   .option('-o, --outDir <dir>', 'The path to the directory where files should be generated', process.env.OPEN_API_OUT)
   .option('-l, --language <js|ts>', 'The language of code to generate', process.env.OPEN_API_LANG)
   .option('--redux', 'True if wanting to generate redux action creators', process.env.OPEN_API_REDUX)
+  .option('--semicolon', 'True if wanting to use a semicolon statement terminator', process.env.OPEN_API_SEMICOLON)
+  .option('--indent <2|4|tab>', 'Indentation to use, defaults to 2 spaces', process.env.OPEN_API_INDENT)
   .parse(process.argv)
 
 genCode(args).then(complete, error)
