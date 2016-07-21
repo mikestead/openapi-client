@@ -21,7 +21,7 @@ function renderHeader() {
   lines.push(`/** @module types */`)
   lines.push(`// Auto-generated, edits will be overwritten`)
   lines.push(``)
-  return lines  
+  return lines
 }
 
 function renderDefinitions(spec: ApiSpec, options: ClientOptions): string[] {
@@ -47,7 +47,7 @@ function renderTsType(name, def, options) {
     console.warn(`Unable to render ${name} ${def.type}, skipping.`)
     return []
   }
-  
+
   const lines = []
   if (def.description) {
     lines.push(`/**`)
@@ -55,7 +55,7 @@ function renderTsType(name, def, options) {
     lines.push(` */`)
   }
   lines.push(`export interface ${name} {`)
-    
+
   const required = def.required || []
   const props = Object.keys(def.properties || {})
   const requiredProps = props.filter(p => !!~required.indexOf(p))
@@ -68,7 +68,7 @@ function renderTsType(name, def, options) {
   const optionalPropLines = optionalProps
     .map(prop => renderTsTypeProp(prop, def.properties[prop], false))
     .reduce((a, b) => a.concat(b), [])
-  
+
   join(lines, requiredPropLines)
   join(lines, optionalPropLines)
   lines.push('}')
@@ -151,17 +151,22 @@ export interface ServiceRequest {
   body: any${ST}
 }
 
+export interface RequestInfo {
+  baseUrl: string${ST}
+  parameters: OperationParamGroups${ST}
+}
+
 export interface ServiceOptions {
   /**
    * The service url.
-   * 
-   * If not specified then defaults to the one defined in the Open API 
+   *
+   * If not specified then defaults to the one defined in the Open API
    * spec used to generate the service api.
    */
   url?: string${ST}
   getAuthorization?: (security: OperationSecurity, securityDefinitions: any, op: OperationInfo) => Promise<OperationRights>${ST}
   formatServiceError?: (response: FetchResponse, data: any) => ServiceError${ST}
-  processParameters?: (op: OperationInfo, parameters: OperationParamGroups) => OperationParamGroups${ST}
+  processRequest?: (op: OperationInfo, reqInfo: RequestInfo) => RequestInfo${ST}
 }
 
 export type OperationRights = {[key: string]: OperationRightsInfo}${ST}
@@ -238,7 +243,7 @@ function renderTypeDoc(name: string, def: any): string[] {
     console.warn(`Unable to render ${name} ${def.type}, skipping.`)
     return []
   }
-  
+
   const group = 'types'
   const lines = [
     '/**',
@@ -278,5 +283,5 @@ function verifyAllOf(name:string, allOf: any[]) {
   const ref = allOf[0]
   if (!ref.$ref) {
     throw new Error(`Json schema allOf '${name}' first element must be a $ref ${ref}`)
-  } 
+  }
 }

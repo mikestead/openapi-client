@@ -12,10 +12,12 @@ export function request(op, parameters) {
 	return acquireRghts(op, spec, options)
 		.then(rights => {
 			parameters = parameters || {};;
-			if (options.processParameters) {
-				parameters = options.processParameters(op, parameters);;
+			const baseUrl = getBaseUrl(spec);;
+			let reqInfo: api.RequestInfo = { parameters, baseUrl };;
+			if (options.processRequest) {
+				reqInfo = options.processRequest(op, reqInfo);;
 			}
-			const req = buildRequest(op, parameters || {}, rights);;
+			const req = buildRequest(op, reqInfo.baseUrl, reqInfo.parameters, rights);;
 			return makeFetchRequest(req).then((res => processResponse(res, options)));;
 		});;
 }
@@ -47,7 +49,11 @@ function makeFetchRequest(req) {
 	return promise;;
 }
 
-function buildRequest(op, parameters, rights) {
+function buildRequest(op, baseUrl, parameters, rights) {
+	let paramGroups = groupParams(op, parameters);;
+	paramGroups = applyAuthorization(paramGroups, rights, spec);;
+	const url = buildUrl(op, baseUrl, paramGroups, spec);;
+
 	let paramGroups = groupParams(op, parameters);;
 	paramGroups = applyAuthorization(paramGroups, rights, spec);;
 	const url = buildUrl(op, paramGroups, spec);;
@@ -85,15 +91,18 @@ function formatParam(param) {
 	else return param.toString();;
 }
 
-function buildUrl(op, parameters, spec) {
-	const base = options.url || `${spec.schemes[0] || 'https'}://${spec.host}${spec.basePath}`;;
-	let url = `${base}${op.path}`;;
+function buildUrl(op, baseUrl, parameters, spec) {
+	let url = `${baseUrl}${op.path}`;;
 	if (parameters.path) {
 		url = Object.keys(parameters.path)
 			.reduce((url, name) => url.replace(`{${name}}`, parameters.path[name]), url);;
 	}
 	const query = createQueryString(parameters.query);;
 	return url + query;;
+}
+
+function getBaseUrl(spec) {
+  return options.url || `${spec.schemes[0] || 'https'}://${spec.host}${spec.basePath}`;;
 }
 
 function createQueryString(query) {
