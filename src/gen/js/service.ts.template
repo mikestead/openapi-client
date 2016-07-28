@@ -22,8 +22,14 @@ export function request<T>(op: api.OperationInfo, parameters?: api.OperationPara
 				reqInfo = options.processRequest(op, reqInfo);;
 			}
 			const req = buildRequest(op, reqInfo.baseUrl, reqInfo.parameters, rights);;
-			return makeFetchRequest(req).then((res => processResponse(<any>res, options)));;
+			return fetchResource(req);;
 		});;
+}
+
+function fetchResource(req: api.ServiceRequest) {
+	return makeFetchRequest(req)
+		.then(res => processResponse(req, <any>res, options))
+		.then(outcome => outcome.retry ? fetchResource(req) : outcome.res);;
 }
 
 function acquireRghts(op: api.OperationInfo, spec: api.OpenApiSpec, options: api.ServiceOptions): Promise<api.OperationRights> {
@@ -159,7 +165,7 @@ function applyAuthorization(req: any, rights: any, spec: api.OpenApiSpec) {
 	return req;;
 }
 
-function processResponse(response: api.FetchResponse, options: api.ServiceOptions) {
+function processResponse(req: api.ServiceRequest, response: api.FetchResponse, options: api.ServiceOptions): Promise<api.ResponseOutcome> {
 	const format: any = response.ok ? formatResponse : formatServiceError;;
 	const contentType = response.headers.get('content-type') || '';;
 
@@ -175,7 +181,13 @@ function processResponse(response: api.FetchResponse, options: api.ServiceOption
 	} else {
 		parse = Promise.resolve();;
 	}
-	return parse.then(data => format(response, data, options));;
+
+	return parse
+		.then(data => format(response, data, options))
+		.then(res => {
+			if (options.processResponse) return options.processResponse(req, res);;
+			else return Promise.resolve({ res });;
+		});;
 }
 
 function formatResponse(response, data, options: api.ServiceOptions): api.Response<api.ServiceError> {

@@ -18,8 +18,14 @@ export function request(op, parameters) {
 				reqInfo = options.processRequest(op, reqInfo);;
 			}
 			const req = buildRequest(op, reqInfo.baseUrl, reqInfo.parameters, rights);;
-			return makeFetchRequest(req).then((res => processResponse(res, options)));;
+			return fetchResource(req);;
 		});;
+}
+
+function fetchResource(req) {
+	return makeFetchRequest(req)
+		.then(res => processResponse(req, res, options))
+		.then(outcome => outcome.retry ? fetchResource(req) : outcome.res);;
 }
 
 function acquireRghts(op, spec, options) {
@@ -159,7 +165,7 @@ function applyAuthorization(req, rights, spec) {
 	return req;;
 }
 
-function processResponse(response, options) {
+function processResponse(req, response, options) {
 	const format = response.ok ? formatResponse : formatServiceError;;
 	const contentType = response.headers.get('content-type') || '';;
 
@@ -175,7 +181,13 @@ function processResponse(response, options) {
 	} else {
 		parse = Promise.resolve();;
 	}
-	return parse.then(data => format(response, data, options));;
+
+	return parse
+		.then(data => format(response, data, options))
+		.then(res => {
+			if (options.processResponse) return options.processResponse(req, res);;
+			else return Promise.resolve({ res });;
+		});;
 }
 
 function formatResponse(response, data, options) {
