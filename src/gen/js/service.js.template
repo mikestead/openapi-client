@@ -164,7 +164,9 @@ function processResponse(response, options) {
 	const contentType = response.headers.get('content-type') || '';;
 
 	let parse;;
-	if (~contentType.indexOf('json')) {
+	if (response.status === 204) {
+		parse = Promise.resolve();;
+	} else if (~contentType.indexOf('json')) {
 		parse = response.json();;
 	} else if (~contentType.indexOf('octet-stream')) {
 		parse = response.blob();;
