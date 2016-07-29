@@ -7,7 +7,7 @@ export default function genReduxActions(spec: ApiSpec, operations: ApiOperation[
   files.forEach(file => writeFileSync(file.path, file.contents))
 }
 
-export function genReduxActionGroupFiles(spec: ApiSpec, operations: ApiOperation[], options: ClientOptions) { 
+export function genReduxActionGroupFiles(spec: ApiSpec, operations: ApiOperation[], options: ClientOptions) {
   const groups = groupOperationsByGroupName(operations)
   const files = []
   for (let name in groups) {
@@ -24,7 +24,7 @@ export function genReduxActionGroupFiles(spec: ApiSpec, operations: ApiOperation
 }
 
 function renderHeader(name: string, spec: ApiSpec, options: ClientOptions): string {
-  
+
   const code = `
 ${options.language === 'ts' && spec.definitions ? '/// <reference path="../types.ts"/>': ''}
 /** @module action/${name} */
@@ -52,8 +52,8 @@ function renderReduxActionBlock(spec: ApiSpec, op: ApiOperation, options: Client
   const response = getBestResponse(op)
   const returnType = response ? getTSParamType(response) : 'any'
   return `
-export const ${actionStart} = '${op.group}/${actionStart}'${ST}
-export const ${actionComplete} = '${op.group}/${actionComplete}'${ST}
+export const ${actionStart} = 's/${op.group}/${actionStart}'${ST}
+export const ${actionComplete} = 's/${op.group}/${actionComplete}'${ST}
 ${isTs ? `export type ${actionComplete} = ${returnType}${ST}`: ''}
 
 export function ${op.id}(${paramSignature})${isTs? ': any' : ''} {

@@ -172,7 +172,7 @@ export interface ServiceOptions {
   getAuthorization?: (security: OperationSecurity, securityDefinitions: any, op: OperationInfo) => Promise<OperationRights>${ST}
   formatServiceError?: (response: FetchResponse, data: any) => ServiceError${ST}
   processRequest?: (op: OperationInfo, reqInfo: RequestInfo) => RequestInfo${ST}
-  processResponse?: (req: api.ServiceRequest, res: Response<any>) => Promise<api.ResponseOutcome>${ST}
+  processResponse?: (req: api.ServiceRequest, res: Response<any>, attempt: number) => Promise<api.ResponseOutcome>${ST}
 }
 
 export type OperationRights = {[key: string]: OperationRightsInfo}${ST}

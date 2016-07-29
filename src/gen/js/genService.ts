@@ -4,10 +4,8 @@ import { exists, writeFileSync } from '../util'
 
 export default function genService(options: ClientOptions) {
   const file = genServiceFile(options)
-  if (!exists(file.path)) {
-    const contents = file.contents.replace(/  /g, SP).replace(/;;/g, ST)
-    writeFileSync(file.path, contents)
-  }
+  const contents = file.contents.replace(/  /g, SP).replace(/;;/g, ST)
+  writeFileSync(file.path, contents)
 }
 
 export function genServiceFile(options: ClientOptions) {

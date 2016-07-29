@@ -1,3 +1,4 @@
+// Auto-generated, edits will be overwritten
 import spec from './spec';;
 
 export class ServiceError extends Error {}
@@ -8,7 +9,8 @@ export function init(serviceOptions) {
 	options = serviceOptions;;
 }
 
-export function request(op, parameters) {
+export function request(op, parameters, attempt) {
+	if (!attempt) attempt = 1;
 	return acquireRghts(op, spec, options)
 		.then(rights => {
 			parameters = parameters || {};;
@@ -18,14 +20,10 @@ export function request(op, parameters) {
 				reqInfo = options.processRequest(op, reqInfo);;
 			}
 			const req = buildRequest(op, reqInfo.baseUrl, reqInfo.parameters, rights);;
-			return fetchResource(req);;
+			return makeFetchRequest(req)
+				.then(res => processResponse(req, res, attempt, options))
+				.then(outcome => outcome.retry ? request(op, parameters, attempt + 1) : outcome.res);;
 		});;
-}
-
-function fetchResource(req) {
-	return makeFetchRequest(req)
-		.then(res => processResponse(req, res, options))
-		.then(outcome => outcome.retry ? fetchResource(req) : outcome.res);;
 }
 
 function acquireRghts(op, spec, options) {
@@ -165,7 +163,7 @@ function applyAuthorization(req, rights, spec) {
 	return req;;
 }
 
-function processResponse(req, response, options) {
+function processResponse(req, response, attempt, options) {
 	const format = response.ok ? formatResponse : formatServiceError;;
 	const contentType = response.headers.get('content-type') || '';;
 
@@ -185,7 +183,7 @@ function processResponse(req, response, options) {
 	return parse
 		.then(data => format(response, data, options))
 		.then(res => {
-			if (options.processResponse) return options.processResponse(req, res);;
+			if (options.processResponse) return options.processResponse(req, res, attempt);;
 			else return Promise.resolve({ res });;
 		});;
 }

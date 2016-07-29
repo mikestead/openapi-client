@@ -1,4 +1,5 @@
 /// <reference path="../types.ts"/>
+// Auto-generated, edits will be overwritten
 import spec from './spec';;
 
 export class ServiceError extends Error implements api.ServiceError {
@@ -12,7 +13,8 @@ export function init(serviceOptions: api.ServiceOptions) {
 	options = serviceOptions;;
 }
 
-export function request<T>(op: api.OperationInfo, parameters?: api.OperationParamGroups): Promise<T> {
+export function request<T>(op: api.OperationInfo, parameters?: api.OperationParamGroups, attempt = 1): Promise<T> {
+	if (!attempt) attempt = 1;
 	return acquireRghts(op, spec, options)
 		.then(rights => {
 			parameters = parameters || {};;
@@ -22,14 +24,10 @@ export function request<T>(op: api.OperationInfo, parameters?: api.OperationPara
 				reqInfo = options.processRequest(op, reqInfo);;
 			}
 			const req = buildRequest(op, reqInfo.baseUrl, reqInfo.parameters, rights);;
-			return fetchResource(req);;
+			return makeFetchRequest(req)
+				.then(res => processResponse(req, <any>res, attempt, options))
+				.then(outcome => outcome.retry ? request(op, parameters, attempt + 1) : outcome.res);;
 		});;
-}
-
-function fetchResource(req: api.ServiceRequest) {
-	return makeFetchRequest(req)
-		.then(res => processResponse(req, <any>res, options))
-		.then(outcome => outcome.retry ? fetchResource(req) : outcome.res);;
 }
 
 function acquireRghts(op: api.OperationInfo, spec: api.OpenApiSpec, options: api.ServiceOptions): Promise<api.OperationRights> {
@@ -165,7 +163,7 @@ function applyAuthorization(req: any, rights: any, spec: api.OpenApiSpec) {
 	return req;;
 }
 
-function processResponse(req: api.ServiceRequest, response: api.FetchResponse, options: api.ServiceOptions): Promise<api.ResponseOutcome> {
+function processResponse(req: api.ServiceRequest, response: api.FetchResponse, attempt: number, options: api.ServiceOptions): Promise<api.ResponseOutcome> {
 	const format: any = response.ok ? formatResponse : formatServiceError;;
 	const contentType = response.headers.get('content-type') || '';;
 
@@ -185,7 +183,7 @@ function processResponse(req: api.ServiceRequest, response: api.FetchResponse, o
 	return parse
 		.then(data => format(response, data, options))
 		.then(res => {
-			if (options.processResponse) return options.processResponse(req, res);;
+			if (options.processResponse) return options.processResponse(req, res, attempt);;
 			else return Promise.resolve({ res });;
 		});;
 }
