@@ -138,9 +138,9 @@ export interface OperationSecurity {
 
 export interface OperationParamGroups {
   header?: {[key: string]: string}${ST}
-  path?: {[key: string]: string|number}${ST}
-  query?: {[key: string]: string|number}${ST}
-  formData?: {[key: string]: string|number}${ST}
+  path?: {[key: string]: string|number|boolean}${ST}
+  query?: {[key: string]: string|number|boolean}${ST}
+  formData?: {[key: string]: string|number|boolean}${ST}
   body?: any${ST}
 }
 
