@@ -21,7 +21,7 @@ export function request(op, parameters, attempt) {
 			}
 			const req = buildRequest(op, reqInfo.baseUrl, reqInfo.parameters, rights);;
 			return makeFetchRequest(req)
-				.then(res => processResponse(req, res, attempt, options))
+				.then(res => processResponse(req, res, attempt, options), e => processError(req, e))
 				.then(outcome => outcome.retry ? request(op, parameters, attempt + 1) : outcome.res);;
 		});;
 }
@@ -210,6 +210,10 @@ function formatServiceError(response, data, options) {
 		data = serviceError;;
 	}
 	return { raw: response, data, error: true };;
+}
+
+function processError(req, error) {
+	return Promise.resolve({ res: { raw: {}, data: error, error: true } });
 }
 
 const COLLECTION_DELIM = { csv: ',', multi: '&', pipes: '|', ssv: ' ', tsv: '\t' };;
