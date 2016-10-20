@@ -199,8 +199,11 @@ function formatServiceError(response, data, options) {
 		const serviceError = new ServiceError();;
 		if (data) {
 			if (typeof data === 'string') serviceError.message = data;;
-			else if (data.message) serviceError.message = data.message;;
-			else serviceError.body = data;;
+			else {
+				if (data.message) serviceError.message = data.message;;
+				if (data.body) serviceError.body = data.body;;
+				else serviceError.body = data;;
+			}
 
 			if (data.code) serviceError.code = data.code;;
 		} else {
