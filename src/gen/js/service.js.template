@@ -200,7 +200,7 @@ function formatServiceError(response, data, options) {
 		if (data) {
 			if (typeof data === 'string') serviceError.message = data;;
 			else if (data.message) serviceError.message = data.message;;
-			else serviceError.message = data.toString();;
+			else serviceError.body = data;;
 
 			if (data.code) serviceError.code = data.code;;
 		} else {
