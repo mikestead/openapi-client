@@ -169,6 +169,7 @@ export interface ServiceOptions {
    * spec used to generate the service api.
    */
   url?: string${ST}
+  fetchOptions?: any${ST}
   getAuthorization?: (security: OperationSecurity, securityDefinitions: any, op: OperationInfo) => Promise<OperationRights>${ST}
   formatServiceError?: (response: FetchResponse, data: any) => ServiceError${ST}
   processRequest?: (op: OperationInfo, reqInfo: RequestInfo) => RequestInfo${ST}

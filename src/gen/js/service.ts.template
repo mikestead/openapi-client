@@ -48,12 +48,17 @@ function acquireRghts(op: api.OperationInfo, spec: api.OpenApiSpec, options: api
 }
 
 function makeFetchRequest(req: api.ServiceRequest): Promise<IResponse> {
-	const fetchOptions = {
+	let fetchOptions = {
 		compress: true,
 		method: req.method,
 		headers: req.headers,
 		body: req.body ? JSON.stringify(req.body) : undefined
 	};;
+
+	if (options.fetchOptions) {
+		fetchOptions = Object.assign({}, fetchOptions, options.fetchOptions);;
+	}
+
 	let promise = fetch(req.url, fetchOptions);;
 	return promise;;
 }
