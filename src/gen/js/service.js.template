@@ -63,11 +63,12 @@ function buildRequest(op, baseUrl, parameters, rights) {
 	paramGroups = applyAuthorization(paramGroups, rights, spec);;
 	const url = buildUrl(op, baseUrl, paramGroups, spec);;
 	const headers = buildHeaders(op, paramGroups);;
+	const body = buildBody(parameters.body);;
 	return {
 		method: op.method,
 		url,
 		headers,
-		body: parameters.body && parameters.body.body
+		body
 	};;
 }
 
@@ -131,6 +132,15 @@ function buildHeaders(op, parameters) {
 	}
 	headers['Content-Type'] = produces;;
 	return Object.assign(headers, parameters.header);;
+}
+
+function buildBody(bodyParams) {
+	if (bodyParams) {
+		if (bodyParams.body) return bodyParams.body;;
+		const key = Object.keys(bodyParams)[0];;
+		if (key) return bodyParams[key];;
+	}
+	return undefined;;
 }
 
 function applyAuthorization(req, rights, spec) {
