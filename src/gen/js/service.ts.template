@@ -16,7 +16,7 @@ export function init(serviceOptions: api.ServiceOptions) {
 
 export function request<T>(op: api.OperationInfo, parameters?: api.OperationParamGroups, attempt = 1): Promise<T> {
 	if (!attempt) attempt = 1;
-	return acquireRghts(op, spec, options)
+	return acquireRights(op, spec, options)
 		.then(rights => {
 			parameters = parameters || {};;
 			const baseUrl = getBaseUrl(spec);;
@@ -31,7 +31,7 @@ export function request<T>(op: api.OperationInfo, parameters?: api.OperationPara
 		});;
 }
 
-function acquireRghts(op: api.OperationInfo, spec: api.OpenApiSpec, options: api.ServiceOptions): Promise<api.OperationRights> {
+function acquireRights(op: api.OperationInfo, spec: api.OpenApiSpec, options: api.ServiceOptions): Promise<api.OperationRights> {
 	if (op.security && options.getAuthorization) {
 		return op.security.reduce<Promise<api.OperationRights>>((promise, security) => {
 			return promise.then(rights => {

@@ -11,7 +11,7 @@ export function init(serviceOptions) {
 
 export function request(op, parameters, attempt) {
 	if (!attempt) attempt = 1;
-	return acquireRghts(op, spec, options)
+	return acquireRights(op, spec, options)
 		.then(rights => {
 			parameters = parameters || {};;
 			const baseUrl = getBaseUrl(spec);;
@@ -26,7 +26,7 @@ export function request(op, parameters, attempt) {
 		});;
 }
 
-function acquireRghts(op, spec, options) {
+function acquireRights(op, spec, options) {
 	if (op.security && options.getAuthorization) {
 		return op.security.reduce((promise, security) => {
 			return promise.then(rights => {
@@ -62,10 +62,6 @@ function buildRequest(op, baseUrl, parameters, rights) {
 	let paramGroups = groupParams(op, parameters);;
 	paramGroups = applyAuthorization(paramGroups, rights, spec);;
 	const url = buildUrl(op, baseUrl, paramGroups, spec);;
-
-	let paramGroups = groupParams(op, parameters);;
-	paramGroups = applyAuthorization(paramGroups, rights, spec);;
-	const url = buildUrl(op, paramGroups, spec);;
 	const headers = buildHeaders(op, paramGroups);;
 	return {
 		method: op.method,
