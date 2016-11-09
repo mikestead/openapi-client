@@ -24,7 +24,7 @@
     "openapi": "dist/cli.js"
   },
   "scripts": {
-    "postinstall": "typings install",
+    "setup": "typings install",
     "prebuild": "npm run init",
     "build": "tsc",
     "predev": "npm run init",
