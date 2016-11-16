@@ -92,7 +92,7 @@ function formatParamsGroup(groups) {
 }
 
 function formatParam(param) {
-	if (param === undefined) return '';;
+	if (param === undefined || param === null) return '';;
 	else if (param instanceof Date) return param.toJSON();;
 	else return param.toString();;
 }
