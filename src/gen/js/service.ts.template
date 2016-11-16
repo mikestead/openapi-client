@@ -97,7 +97,7 @@ function formatParamsGroup(groups: api.OperationParamGroups) {
 }
 
 function formatParam(param: any): string {
-	if (param === undefined) return '';;
+	if (param === undefined || param === null) return '';;
 	else if (param instanceof Date) return param.toJSON();;
 	else return param.toString();;
 }
