@@ -104,8 +104,8 @@ function renderTsDefaultTypes() {
   host: string${ST}
   basePath: string${ST}
   schemes: string[]${ST}
-  consumes: string[]${ST}
-  produces: string[]${ST}
+  contentTypes: string[]${ST}
+  accepts: string[]${ST}
   securityDefinitions?: {[key: string]: SecurityDefinition}${ST}
 }
 
@@ -127,8 +127,8 @@ export interface OperationInfo {
   path: string${ST}
   method: HttpMethod${ST}
   security?: OperationSecurity[]${ST}
-  consumes?: string[]${ST}
-  produces?: string[]${ST}
+  contentTypes?: string[]${ST}
+  accepts?: string[]${ST}
 }
 
 export interface OperationSecurity {
