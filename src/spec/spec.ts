@@ -35,7 +35,7 @@ function readFile(filePath: string): Promise<string> {
 }
 
 function parseFileContents(contents: string, path: string): Object {
-  return /.ya?ml$/i.test(path) 
+  return /.ya?ml$/i.test(path)
     ? YAML.safeLoad(contents)
     : JSON.parse(contents)
 }
@@ -43,7 +43,7 @@ function parseFileContents(contents: string, path: string): Object {
 function formatSpec(spec: ApiSpec, src?: string, options?: SpecOptions): ApiSpec {
   if (!spec.basePath) spec.basePath = ''
   else if (spec.basePath.endsWith('/')) spec.basePath = spec.basePath.slice(0, -1)
-  
+
   if (src && /^https?:\/\//im.test(src)) {
     const parts = src.split('/')
     if (!spec.host) spec.host = parts[2]
@@ -52,10 +52,20 @@ function formatSpec(spec: ApiSpec, src?: string, options?: SpecOptions): ApiSpec
     if (!spec.host) spec.host = 'localhost'
     if (!spec.schemes || !spec.schemes.length) spec.schemes = ['http']
   }
-  
-  if (!spec.consumes || !spec.consumes.length) spec.consumes = [ 'application/json' ]
-  if (!spec.produces || !spec.produces.length) spec.produces = [ 'application/json' ]
-  
+
+  const s: any = spec
+  if (!s.produces || !s.produces.length) {
+    s.accepts = [ 'application/json' ] // give sensible default
+  } else {
+    s.accepts = s.produces
+  }
+
+  if (!s.consumes) s.contentTypes = []
+  else s.contentTypes = s.consumes
+
+  delete s.consumes
+  delete s.produces
+
   return <ApiSpec>expandRefs(spec, spec, options)
 }
 

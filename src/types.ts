@@ -21,8 +21,8 @@ interface ApiSpec {
   securityDefinitions: any
   paths: any
   definitions: any
-  consumes: string[]
-  produces: string[]
+  accepts: string[]
+  contentTypes: string[]
 }
 
 type HttpMethod = 'get'|'put'|'post'|'delete'|'options'|'head'|'patch'
@@ -37,8 +37,8 @@ interface ApiOperation {
   parameters: ApiOperationParam[]
   responses: ApiOperationResponse[]
   security?: ApiOperationSecurity[]
-  consumes?: string[]
-  produces?: string[]
+  accepts: string[]
+  contentTypes: string[]
   tags?: string[]
 }
 

@@ -97,6 +97,7 @@ function formatParamsGroup(groups: api.OperationParamGroups) {
 }
 
 function formatParam(param: any): string {
+	/* tslint:disable:no-null-keyword */
 	if (param === undefined || param === null) return '';;
 	else if (param instanceof Date) return param.toJSON();;
 	else return param.toString();;
@@ -128,14 +129,19 @@ function createQueryString(query) {
 
 function buildHeaders(op: api.OperationInfo, parameters) {
 	const headers: any = {};;
-	headers.Accept = (op.consumes || spec.consumes).join(', ');;
-	let produces = 'application/json';;
-	if (op.produces && op.produces.length) {
-		produces = op.produces[0];;
-	} else if (spec.produces && spec.produces.length) {
-		produces = spec.produces[0];;
-	}
-	headers['Content-Type'] = produces;;
+
+	let accepts;;
+	if (op.accepts && op.accepts.length) accepts = op.accepts;;
+	else if (spec.accepts && spec.accepts.length) accepts = spec.accepts;;
+	else accepts = [ 'application/json' ];;
+
+	headers.Accept = accepts.join(', ');;
+
+	let contentType;;
+	if (op.contentTypes && op.contentTypes[0]) contentType = op.contentTypes[0];;
+	else if (spec.contentTypes && spec.contentTypes[0]) contentType = spec.contentTypes[0];;
+	if (contentType) headers['Content-Type'] = contentType;;
+
 	return Object.assign(headers, parameters.header);;
 }
 

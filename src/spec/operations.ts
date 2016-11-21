@@ -32,6 +32,15 @@ function getPathOperation(method: HttpMethod, pathInfo, spec: ApiSpec): ApiOpera
   delete op.operationId
   op.responses = getOperationResponses(op)
   op.security = getOperationSecurity(op)
+
+  const operation: any = op
+  if (operation.consumes) operation.contentTypes = operation.consumes
+  if (operation.produces) operation.accepts = operation.produces
+  delete operation.consumes
+  delete operation.produces
+
+  if (!op.contentTypes || !op.contentTypes.length) op.contentTypes = spec.contentTypes.slice()
+  if (!op.accepts || !op.accepts.length) op.accepts = spec.accepts.slice()
   return <ApiOperation> op
 }
 

@@ -29,7 +29,7 @@ export function genOperationGroupFiles(spec: ApiSpec, operations: ApiOperation[]
 
 function renderHeader(name: string, spec: ApiSpec, options: ClientOptions): string[] {
   const lines = []
-  if (spec.definitions) {
+  if (spec.definitions && options.language === 'ts') {
     lines.push(`/// <reference path="types.ts"/>`)
   }
   lines.push(`/** @module ${name} */`)
@@ -69,10 +69,10 @@ function renderDocDescription(op: ApiOperation) {
 function renderDocParams(op: ApiOperation) {
   const params = op.parameters
   if (!params.length) return []
-  
+
   const required = params.filter(param => param.required)
   const optional = params.filter(param => !param.required)
-  
+
   const lines = []
   join(lines, required.map(renderDocParam))
   if (optional.length) {
@@ -129,7 +129,7 @@ export function renderParamSignature(op: ApiOperation, options: ClientOptions, p
   const funcParams = renderRequiredParamsSignature(required, options)
   const optParam = renderOptionalParamsSignature(op, optional, options, pkg)
   if (optParam.length) funcParams.push(optParam)
-  
+
   return funcParams.map(p => p.join(': ')).join(', ')
 }
 
@@ -174,7 +174,7 @@ function renderOperationObject(spec: ApiSpec, op: ApiOperation, options: ClientO
   names.forEach((name, i) => {
     join(lines, renderParamGroup(name, parameters[name], i === last))
   })
-  
+
   if (lines.length) {
     if (options.language === 'ts') {
       lines.unshift(`${SP}const parameters: api.OperationParamGroups = {`)
@@ -193,7 +193,7 @@ function groupParams(groups: any, param: ApiOperationParam): any {
   const name = getParamName(param.name)
   const realName = /^[_$a-z0-9]+$/gim.test(param.name) ? param.name : `'${param.name}'`
   const value = param.required ? name : 'options.' + name
-  
+
   if (param.type === 'array') {
     if (!param.collectionFormat) throw new Error(`param ${param.name} must specify an array collectionFormat`)
     const str = `gateway.formatArrayParam(${value}, '${param.collectionFormat}', '${param.name}')`
@@ -216,7 +216,7 @@ function renderParamGroup(name: string, groupLines: string[], last: boolean): st
 }
 
 function renderRequestCall(op: ApiOperation, options: ClientOptions) {
-  const params = op.parameters.length ? ', parameters': '' 
+  const params = op.parameters.length ? ', parameters': ''
   return [ `${SP}return gateway.request(${op.id}Operation${params})${ST}`, '}' ]
 }
 
@@ -247,6 +247,11 @@ function renderOperationInfo(spec: ApiSpec, op: ApiOperation, options: ClientOpt
     lines.push(`const ${op.id}Operation = {`)
   }
   lines.push(`${SP}path: '${op.path}',`)
+
+  const hasBody = op.parameters.some(p => p.in === 'body')
+  if (hasBody && op.contentTypes.length) {
+    lines.push(`${SP}contentTypes: ['${op.contentTypes.join("','")}'],`)
+  }
   lines.push(`${SP}method: '${op.method}'${op.security ? ',': ''}`)
   if (op.security && op.security.length) {
     const secLines = renderSecurityInfo(op.security)

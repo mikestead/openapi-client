@@ -18,8 +18,8 @@ function renderSpecView(spec: ApiSpec, options: ClientOptions): string {
     host: spec.host,
     schemes: spec.schemes,
     basePath: spec.basePath,
-    consumes: spec.consumes,
-    produces: spec.produces,
+    contentTypes: spec.contentTypes,
+    accepts: spec.accepts,
     securityDefinitions: spec.securityDefinitions
   }
   const type = (options.language === 'ts') ?  ': api.OpenApiSpec' : ''
