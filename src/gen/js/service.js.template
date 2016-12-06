@@ -15,7 +15,7 @@ export function request(op, parameters, attempt) {
 		.then(rights => {
 			parameters = parameters || {};;
 			const baseUrl = getBaseUrl(spec);;
-			let reqInfo: api.RequestInfo = { parameters, baseUrl };;
+			let reqInfo = { parameters, baseUrl };;
 			if (options.processRequest) {
 				reqInfo = options.processRequest(op, reqInfo);;
 			}
