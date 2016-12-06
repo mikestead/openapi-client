@@ -119,9 +119,9 @@ function getBaseUrl(spec: api.OpenApiSpec) {
 }
 
 function createQueryParam(key: string, value: string) {
-	value = formatParam(value);;
-	if (!value) return key;;
-	return `${key}=${encodeURIComponent(value)}`;;
+	const v = formatParam(value);;
+	if (v && typeof v === 'string') return `${key}=${encodeURIComponent(v)}`;;
+	return key;
 }
 
 function createQueryString(query) {

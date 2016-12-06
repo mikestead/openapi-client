@@ -22,7 +22,7 @@ function renderSpecView(spec: ApiSpec, options: ClientOptions): string {
     accepts: spec.accepts,
     securityDefinitions: spec.securityDefinitions
   }
-  const type = (options.language === 'ts') ?  ': api.OpenApiSpec' : ''
+  const type = (options.language === 'ts') ? ': api.OpenApiSpec' : ''
   return `${options.language === 'ts' ? '/// <reference path="../types.ts"/>': ''}
 // Auto-generated, edits will be overwritten
 const spec${type} = ${stringify(view)}${ST}

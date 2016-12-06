@@ -27,7 +27,7 @@ function renderHeader() {
 function renderDefinitions(spec: ApiSpec, options: ClientOptions): string[] {
   const isTs = (options.language === 'ts')
   const defs = spec.definitions || {}
-  const typeLines = [`namespace api {`]
+  const typeLines = isTs ? [`namespace api {`] : undefined
   const docLines = []
   Object.keys(defs).forEach(name => {
     const def = defs[name]
@@ -36,9 +36,11 @@ function renderDefinitions(spec: ApiSpec, options: ClientOptions): string[] {
     }
     join(docLines, renderTypeDoc(name, def))
   })
-  join(typeLines, renderTsDefaultTypes())
-  typeLines.push('}')
-  return typeLines.concat(docLines)
+  if (isTs) {
+    join(typeLines, renderTsDefaultTypes())
+    typeLines.push('}')
+  }
+  return isTs ? typeLines.concat(docLines) : docLines
 }
 
 function renderTsType(name, def, options) {
@@ -139,7 +141,7 @@ export interface OperationSecurity {
 export interface OperationParamGroups {
   header?: {[key: string]: string}${ST}
   path?: {[key: string]: string|number|boolean}${ST}
-  query?: {[key: string]: string|number|boolean}${ST}
+  query?: {[key: string]: string|string[]|number|boolean}${ST}
   formData?: {[key: string]: string|number|boolean}${ST}
   body?: any${ST}
 }
