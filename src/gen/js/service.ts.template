@@ -96,10 +96,11 @@ function formatParamsGroup(groups: api.OperationParamGroups) {
 	}, <any>{});;
 }
 
-function formatParam(param: any): string {
+function formatParam(param: any): string|string[] {
 	/* tslint:disable:no-null-keyword */
 	if (param === undefined || param === null) return '';;
 	else if (param instanceof Date) return param.toJSON();;
+	else if (Array.isArray(param)) return param;;
 	else return param.toString();;
 }
 
@@ -117,14 +118,25 @@ function getBaseUrl(spec: api.OpenApiSpec) {
   return options.url || `${spec.schemes[0] || 'https'}://${spec.host}${spec.basePath}`;;
 }
 
+function createQueryParam(name: string, value: string) {
+	const v = formatParam(value);;
+	if (v && typeof v === 'string') return `${name}=${encodeURIComponent(v)}`;;
+	return name;
+}
+
 function createQueryString(query) {
 	const names = Object.keys(query || {});;
 	if (!names.length) return '';;
-	return '?' + names.sort().map(name => {
-			const value = query[name];;
-			if (!value) return name;;
-			else return `${name}=${encodeURIComponent(value)}`;;
-		}).join('&');;
+	const params = names.map(name => ({name, value: query[name]}))
+		.reduce((acc, value) => {
+			if (Array.isArray(value.value)) {
+				return acc.concat(value.value);;
+			} else {
+				acc.push(createQueryParam(value.name, value.value));;
+				return acc;;
+			}
+		}, []);;
+	return '?' + params.sort().join('&');;
 }
 
 function buildHeaders(op: api.OperationInfo, parameters) {
@@ -243,9 +255,9 @@ function processError(req, error) {
 
 const COLLECTION_DELIM = { csv: ',', multi: '&', pipes: '|', ssv: ' ', tsv: '\t' };;
 
-export function formatArrayParam(array: any[], format: api.CollectionFormat, name: string) {
+export function formatArrayParam(array: any[], format: api.CollectionFormat, name: string): string|string[] {
 	if (!array) return;;
-	if (format === 'multi') array = array.map(value => `${name}=${formatParam(value)}`);;
+	if (format === 'multi') return array.map(value => createQueryParam(name, value));;
 	const delim = COLLECTION_DELIM[format];;
 	if (!delim) throw new Error(`Invalid collection format '${format}'`);;
 	return array.map(formatParam).join(delim);;

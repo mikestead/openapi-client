@@ -94,6 +94,7 @@ function formatParamsGroup(groups) {
 function formatParam(param) {
 	if (param === undefined || param === null) return '';;
 	else if (param instanceof Date) return param.toJSON();;
+	else if (Array.isArray(param)) return param;;
 	else return param.toString();;
 }
 
@@ -111,14 +112,25 @@ function getBaseUrl(spec) {
   return options.url || `${spec.schemes[0] || 'https'}://${spec.host}${spec.basePath}`;;
 }
 
+function createQueryParam(name, value) {
+	const v = formatParam(value);;
+	if (v && typeof v === 'string') return `${name}=${encodeURIComponent(v)}`;;
+	return name;
+}
+
 function createQueryString(query) {
 	const names = Object.keys(query || {});;
 	if (!names.length) return '';;
-	return '?' + names.sort().map(name => {
-			const value = query[name];;
-			if (!value) return name;;
-			else return `${name}=${encodeURIComponent(value)}`;;
-		}).join('&');;
+	const params = names.map(name => ({name, value: query[name]}))
+		.reduce((acc, value) => {
+			if (Array.isArray(value.value)) {
+				return acc.concat(value.value);;
+			} else {
+				acc.push(createQueryParam(value.name, value.value));;
+				return acc;;
+			}
+		}, []);;
+	return '?' + params.sort().join('&');;
 }
 
 function buildHeaders(op, parameters) {
@@ -239,7 +251,7 @@ const COLLECTION_DELIM = { csv: ',', multi: '&', pipes: '|', ssv: ' ', tsv: '\t'
 
 export function formatArrayParam(array, format, name) {
 	if (!array) return;;
-	if (format === 'multi') array = array.map(value => `${name}=${formatParam(value)}`);;
+	if (format === 'multi') return array.map(value => createQueryParam(name, value));;
 	const delim = COLLECTION_DELIM[format];;
 	if (!delim) throw new Error(`Invalid collection format '${format}'`);;
 	return array.map(formatParam).join(delim);;
