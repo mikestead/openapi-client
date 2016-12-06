@@ -114,8 +114,8 @@ function getBaseUrl(spec) {
 
 function createQueryParam(name, value) {
 	const v = formatParam(value);;
-	if (v && typeof v === 'string') return `${key}=${encodeURIComponent(v)}`;;
-	return key;
+	if (v && typeof v === 'string') return `${name}=${encodeURIComponent(v)}`;;
+	return name;
 }
 
 function createQueryString(query) {

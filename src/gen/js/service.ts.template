@@ -118,10 +118,10 @@ function getBaseUrl(spec: api.OpenApiSpec) {
   return options.url || `${spec.schemes[0] || 'https'}://${spec.host}${spec.basePath}`;;
 }
 
-function createQueryParam(key: string, value: string) {
+function createQueryParam(name: string, value: string) {
 	const v = formatParam(value);;
-	if (v && typeof v === 'string') return `${key}=${encodeURIComponent(v)}`;;
-	return key;
+	if (v && typeof v === 'string') return `${name}=${encodeURIComponent(v)}`;;
+	return name;
 }
 
 function createQueryString(query) {
