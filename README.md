@@ -16,6 +16,12 @@ Or globally to run CLI from anywhere
 
     npm install openapi-client -g
 
+### Type Dependencies
+
+If targeting TypeScript you'll also need to install the `isomorphic-fetch` typings in your project.
+
+    npm install @types/isomorphic-fetch --save-dev
+
 ## Usage
 
 ### CLI
