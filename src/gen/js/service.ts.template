@@ -47,7 +47,7 @@ function acquireRights(op: api.OperationInfo, spec: api.OpenApiSpec, options: ap
 	return Promise.resolve({});;
 }
 
-function makeFetchRequest(req: api.ServiceRequest): Promise<IResponse> {
+function makeFetchRequest(req: api.ServiceRequest): Promise<Response> {
 	let fetchOptions = {
 		compress: true,
 		method: req.method,

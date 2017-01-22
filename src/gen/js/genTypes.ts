@@ -204,7 +204,7 @@ export interface FetchResponse extends FetchBody {
   status: number${ST}
   statusText: string${ST}
   ok: boolean${ST}
-  headers: IHeaders${ST}
+  headers: Headers${ST}
   type: string | FetchResponseType${ST}
   size: number${ST}
   timeout: number${ST}
