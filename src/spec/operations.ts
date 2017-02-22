@@ -28,6 +28,14 @@ function getPathOperations(pathInfo, spec): ApiOperation[] {
 function getPathOperation(method: HttpMethod, pathInfo, spec: ApiSpec): ApiOperation {
   const op = Object.assign({ method, path: pathInfo.path, parameters: [] }, pathInfo[method])
   op.id = op.operationId
+
+  // if there's no explicit operationId given, create one based on the method and path
+  if (!op.id) {
+    op.id = method + pathInfo.path
+    op.id = op.id.replace(/[\/{(?\/{)]([^{.])/g, (_, m) => m.toUpperCase());
+    op.id = op.id.replace(/[\/}]/g, '');
+  }
+
   op.group = getOperationGroupName(op)
   delete op.operationId
   op.responses = getOperationResponses(op)
@@ -60,7 +68,7 @@ function getOperationResponses(op: any): ApiOperationResponse[] {
 
 function getOperationSecurity(op: any): ApiOperationSecurity[] {
   if (!op.security || !op.security.length) return
-  
+
   return op.security.map(def => {
     const id = Object.keys(def)[0]
     const scopes = def[id].length ? def[id] : undefined
