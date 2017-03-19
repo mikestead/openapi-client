@@ -14,7 +14,7 @@ export function init(serviceOptions: api.ServiceOptions) {
 	options = serviceOptions;;
 }
 
-export function request<T>(op: api.OperationInfo, parameters?: api.OperationParamGroups, attempt = 1): Promise<T> {
+export function request<T>(op: api.OperationInfo, parameters?: api.OperationParamGroups, attempt = 1): Promise<T | api.OperationRights> {
 	if (!attempt) attempt = 1;
 	return acquireRights(op, spec, options)
 		.then(rights => {
@@ -250,7 +250,7 @@ function formatServiceError(response: api.FetchResponse, data, options: api.Serv
 }
 
 function processError(req, error) {
-	return Promise.resolve({ res: { raw: {}, data: error, error: true } });
+	return Promise.resolve(<api.ResponseOutcome>{ res: { raw: {}, data: error, error: true } });
 }
 
 const COLLECTION_DELIM = { csv: ',', multi: '&', pipes: '|', ssv: ' ', tsv: '\t' };;
