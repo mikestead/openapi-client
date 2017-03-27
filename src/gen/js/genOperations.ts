@@ -231,7 +231,11 @@ function renderOperationParamType(spec: ApiSpec, op: ApiOperation, options: Clie
       lines.push(`${SP}${DOC}` + (param.description || '').trim().replace(/\n/g, `\n${SP}${DOC}${SP}`))
       lines.push(`${SP} */`)
     }
-    lines.push(`${SP}${getParamName(param.name)}?: ${getTSParamType(param)}${ST}`)
+    if (getParamName(param.name) === 'file') {
+      lines.push(`${SP}${getParamName(param.name)}?: ${getTSParamType(param)}${ST}`)
+    } else {
+      lines.push(`${SP}${getParamName(param.name)}?: ${getTSParamType(param).charAt(0).toUpperCase()}${ST}`)
+    }
   })
   lines.push('}')
   lines.push('')

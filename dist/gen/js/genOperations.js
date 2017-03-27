@@ -222,7 +222,12 @@ function renderOperationParamType(spec, op, options) {
             lines.push(`${support_1.SP}${support_1.DOC}` + (param.description || '').trim().replace(/\n/g, `\n${support_1.SP}${support_1.DOC}${support_1.SP}`));
             lines.push(`${support_1.SP} */`);
         }
-        lines.push(`${support_1.SP}${getParamName(param.name)}?: ${support_1.getTSParamType(param)}${support_1.ST}`);
+        if (getParamName(param.name) === 'file') {
+            lines.push(`${support_1.SP}${getParamName(param.name)}?: ${support_1.getTSParamType(param)}${support_1.ST}`);
+        }
+        else {
+            lines.push(`${support_1.SP}${getParamName(param.name)}?: ${support_1.getTSParamType(param).charAt(0).toUpperCase()}${support_1.ST}`);
+        }
     });
     lines.push('}');
     lines.push('');
