@@ -142,7 +142,7 @@ export interface OperationParamGroups {
   header?: {[key: string]: string}${ST}
   path?: {[key: string]: string|number|boolean}${ST}
   query?: {[key: string]: string|string[]|number|boolean}${ST}
-  formData?: {[key: string]: string|number|boolean}${ST}
+  formData?: {[key: string]: string|number|boolean|File}${ST}
   body?: any${ST}
 }
 
