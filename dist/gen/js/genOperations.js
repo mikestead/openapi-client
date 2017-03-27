@@ -223,10 +223,10 @@ function renderOperationParamType(spec, op, options) {
             lines.push(`${support_1.SP} */`);
         }
         if (getParamName(param.name) === 'file') {
-            lines.push(`${support_1.SP}${getParamName(param.name)}?: ${support_1.getTSParamType(param)}${support_1.ST}`);
+            lines.push(`${support_1.SP}${getParamName(param.name)}?: ${support_1.getTSParamType(param)[0].toUpperCase() + support_1.getTSParamType(param).slice(1)}${support_1.ST}`);
         }
         else {
-            lines.push(`${support_1.SP}${getParamName(param.name)}?: ${support_1.getTSParamType(param).charAt(0).toUpperCase()}${support_1.ST}`);
+            lines.push(`${support_1.SP}${getParamName(param.name)}?: ${support_1.getTSParamType(param)}${support_1.ST}`);
         }
     });
     lines.push('}');
