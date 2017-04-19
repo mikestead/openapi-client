@@ -51,7 +51,13 @@ function makeFetchRequest(req) {
 	};;
 
 	if (options.fetchOptions) {
-		fetchOptions = Object.assign({}, fetchOptions, options.fetchOptions);;
+		const opts = options.fetchOptions;;
+		const headers = opts.headers
+			? Object.assign(fetchOptions.headers, opts.headers)
+			: fetchOptions.headers;;
+
+		fetchOptions = Object.assign({}, fetchOptions, opts);;
+		fetchOptions.headers = headers;;
 	}
 
 	let promise = fetch(req.url, fetchOptions);;

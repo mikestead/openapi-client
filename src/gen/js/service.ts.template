@@ -48,7 +48,7 @@ function acquireRights(op: api.OperationInfo, spec: api.OpenApiSpec, options: ap
 }
 
 function makeFetchRequest(req: api.ServiceRequest): Promise<Response> {
-	let fetchOptions = {
+	let fetchOptions: any = {
 		compress: true,
 		method: req.method,
 		headers: req.headers,
@@ -56,7 +56,13 @@ function makeFetchRequest(req: api.ServiceRequest): Promise<Response> {
 	};;
 
 	if (options.fetchOptions) {
-		fetchOptions = Object.assign({}, fetchOptions, options.fetchOptions);;
+		const opts = options.fetchOptions;;
+		const headers = opts.headers
+			? Object.assign(fetchOptions.headers, opts.headers)
+			: fetchOptions.headers;;
+
+		fetchOptions = Object.assign({}, fetchOptions, opts);;
+		fetchOptions.headers = headers;;
 	}
 
 	let promise = fetch(req.url, fetchOptions);;
