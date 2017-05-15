@@ -5,6 +5,7 @@ interface ClientOptions {
   redux?: boolean
   indent?: '2'|'4'|'tab'
   semicolon?: boolean
+  genOnlyTypes: boolean
 }
 
 interface ApiRequestData {

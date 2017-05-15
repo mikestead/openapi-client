@@ -30,20 +30,26 @@ function renderDefinitions(spec: ApiSpec, options: ClientOptions): string[] {
   const typeLines = isTs ? [`namespace api {`] : undefined
   const docLines = []
   Object.keys(defs).forEach(name => {
-    const def = defs[name]
+    const def = defs[name];
     if (isTs) {
       join(typeLines, renderTsType(name, def, options))
     }
-    join(docLines, renderTypeDoc(name, def))
-  })
+    if (!options.genOnlyTypes) {
+      join(docLines, renderTypeDoc(name, def))
+    }
+  });
   if (isTs) {
-    join(typeLines, renderTsDefaultTypes())
+    if (!options.genOnlyTypes) {
+      join(typeLines, renderTsDefaultTypes())
+    }
     typeLines.push('}')
   }
   return isTs ? typeLines.concat(docLines) : docLines
 }
 
 function renderTsType(name, def, options) {
+  name = name.replace('«', 'Of');
+  name = name.replace('»', '');
   if (def.allOf) return renderTsInheritance(name, def.allOf, options)
   if (def.type !== 'object') {
     console.warn(`Unable to render ${name} ${def.type}, skipping.`)
