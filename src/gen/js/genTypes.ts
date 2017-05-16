@@ -97,13 +97,17 @@ function renderTsInheritance(name: string, allOf: any[], options: ClientOptions)
 function renderTsTypeProp(prop: string, info: any, required: boolean): string[] {
   const lines = []
   const type = getTSParamType(info, true)
+  let format = '';
+  if (info.format) {
+    format = ` // ${info.format}`
+  }
   if (info.description) {
     lines.push(`${SP}/**`)
     lines.push(`${SP}${DOC}` + (info.description || '').trim().replace(/\n/g, `\n${SP}${DOC}${SP}`))
     lines.push(`${SP} */`)
   }
   const req = required ? '' : '?'
-  lines.push(`${SP}${prop}${req}: ${type}${ST}`)
+  lines.push(`${SP}${prop}${req}: ${type}${ST}${format}`)
   return lines
 }
 

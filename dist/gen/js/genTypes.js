@@ -91,13 +91,17 @@ function renderTsInheritance(name, allOf, options) {
 function renderTsTypeProp(prop, info, required) {
     const lines = [];
     const type = support_1.getTSParamType(info, true);
+    let format = '';
+    if (info.format) {
+        format = ` // ${info.format}`;
+    }
     if (info.description) {
         lines.push(`${support_1.SP}/**`);
         lines.push(`${support_1.SP}${support_1.DOC}` + (info.description || '').trim().replace(/\n/g, `\n${support_1.SP}${support_1.DOC}${support_1.SP}`));
         lines.push(`${support_1.SP} */`);
     }
     const req = required ? '' : '?';
-    lines.push(`${support_1.SP}${prop}${req}: ${type}${support_1.ST}`);
+    lines.push(`${support_1.SP}${prop}${req}: ${type}${support_1.ST}${format}`);
     return lines;
 }
 function renderTsDefaultTypes() {
