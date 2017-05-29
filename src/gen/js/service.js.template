@@ -45,7 +45,7 @@ function acquireRights(op, spec, options) {
 function makeFetchRequest(req) {
 	let fetchOptions = {
 		compress: true,
-		method: req.method,
+		method: (req.method || 'get').toUpperCase(),
 		headers: req.headers,
 		body: req.body ? JSON.stringify(req.body) : undefined
 	};;

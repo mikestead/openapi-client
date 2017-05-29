@@ -50,7 +50,7 @@ function acquireRights(op: api.OperationInfo, spec: api.OpenApiSpec, options: ap
 function makeFetchRequest(req: api.ServiceRequest): Promise<Response> {
 	let fetchOptions: any = {
 		compress: true,
-		method: req.method,
+		method: (req.method || 'get').toUpperCase(),
 		headers: req.headers,
 		body: req.body ? JSON.stringify(req.body) : undefined
 	};;
