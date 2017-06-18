@@ -47,8 +47,10 @@ function renderDefinitions(spec, options) {
     return isTs ? typeLines.concat(docLines) : docLines;
 }
 function renderTsType(name, def, options) {
-    name = name.replace('«', 'Of');
-    name = name.replace('»', '');
+    name = name
+        .replace(/«/g, 'Oftype')
+        .replace(/»/g, 'Endoftype')
+        .replace(/,/g, 'Andtype');
     if (def.allOf)
         return renderTsInheritance(name, def.allOf, options);
     if (def.type !== 'object') {
