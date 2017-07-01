@@ -14,7 +14,7 @@ export function init(serviceOptions: api.ServiceOptions) {
 	options = serviceOptions;;
 }
 
-export function request<T>(op: api.OperationInfo, parameters?: api.OperationParamGroups, attempt = 1): Promise<T | api.OperationRights> {
+export function request(op: api.OperationInfo, parameters?: api.OperationParamGroups, attempt = 1): Promise<any> {
 	if (!attempt) attempt = 1;
 	return acquireRights(op, spec, options)
 		.then(rights => {
