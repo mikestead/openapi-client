@@ -262,3 +262,8 @@ export function formatArrayParam(array, format, name) {
 	if (!delim) throw new Error(`Invalid collection format '${format}'`);;
 	return array.map(formatParam).join(delim);;
 }
+
+export function formatDate(date, format) {
+	const str = date.toISOString();
+	return (format === 'date') ? str.split('T')[0] : str;
+}

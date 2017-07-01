@@ -268,3 +268,8 @@ export function formatArrayParam(array: any[], format: api.CollectionFormat, nam
 	if (!delim) throw new Error(`Invalid collection format '${format}'`);;
 	return array.map(formatParam).join(delim);;
 }
+
+export function formatDate(date: Date, format: 'date'|'date-time'): string {
+	const str = date.toISOString();
+	return (format === 'date') ? str.split('T')[0] : str;
+}

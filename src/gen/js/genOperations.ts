@@ -198,6 +198,9 @@ function groupParams(groups: any, param: ApiOperationParam): any {
     if (!param.collectionFormat) throw new Error(`param ${param.name} must specify an array collectionFormat`)
     const str = `gateway.formatArrayParam(${value}, '${param.collectionFormat}', '${param.name}')`
     group.push(`${SP.repeat(3)}${realName}: ${str}`)
+  } else if (param.format === 'date' || param.format === 'date-time') {
+    const str = `gateway.formatDate(${value}, '${param.format}')`
+    group.push(`${SP.repeat(3)}${realName}: ${str}`)
   } else if (param.required && param.name === name && name === realName) {
     group.push(`${SP.repeat(3)}${realName}`)
   } else {
