@@ -94,8 +94,9 @@ export function getTSParamType(param: any, inTypesModule?: boolean): string {
     return 'number'
   } else if (param.type === 'string' && (param.format === 'date-time' || param.format === 'date')) {
     return 'Date'
-  }
-  else {
+  } else if (param.type === 'file') {
+    return 'File'
+  } else {
     return param.type || 'any'
   }
 }
