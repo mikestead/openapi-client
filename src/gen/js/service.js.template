@@ -258,7 +258,10 @@ function formatServiceError(response, data, options) {
 }
 
 function processError(req, error) {
-	return Promise.resolve({ res: { raw: {}, data: error, error: true } });
+  const { processError } = options;;
+  const res = { res: { raw: error, data: error, error: true } };;
+
+  return Promise.resolve(processError ? processError(req, res) : res);;
 }
 
 const COLLECTION_DELIM = { csv: ',', multi: '&', pipes: '|', ssv: ' ', tsv: '\t' };;
