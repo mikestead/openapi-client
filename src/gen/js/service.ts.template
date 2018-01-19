@@ -264,7 +264,10 @@ function formatServiceError(response: api.FetchResponse, data, options: api.Serv
 }
 
 function processError(req, error) {
-	return Promise.resolve(<api.ResponseOutcome>{ res: { raw: {}, data: error, error: true } });
+	const { processError } = options;;
+	const res: api.ResponseOutcome = { res: { raw: {}, data: error, error: true } };;
+
+	return Promise.resolve(processError ? processError(req, res) : res);;
 }
 
 const COLLECTION_DELIM = { csv: ',', multi: '&', pipes: '|', ssv: ' ', tsv: '\t' };;
