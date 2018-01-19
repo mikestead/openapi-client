@@ -265,7 +265,7 @@ function formatServiceError(response: api.FetchResponse, data, options: api.Serv
 
 function processError(req, error) {
 	const { processError } = options;;
-	const res: api.ResponseOutcome = { res: { raw: {}, data: error, error: true } };;
+	const res: api.ResponseOutcome = { res: { raw: {} as api.FetchResponse, data: error, error: true } };;
 
 	return Promise.resolve(processError ? processError(req, res) : res);;
 }
