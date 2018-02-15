@@ -39,7 +39,7 @@ function getPathOperation(method: HttpMethod, pathInfo, spec: ApiSpec): ApiOpera
   op.group = getOperationGroupName(op)
   delete op.operationId
   op.responses = getOperationResponses(op)
-  op.security = getOperationSecurity(op)
+  op.security = getOperationSecurity(op) || getApiSecurity(spec)
 
   const operation: any = op
   if (operation.consumes) operation.contentTypes = operation.consumes
@@ -67,11 +67,29 @@ function getOperationResponses(op: any): ApiOperationResponse[] {
 }
 
 function getOperationSecurity(op: any): ApiOperationSecurity[] {
-  if (!op.security || !op.security.length) return
+  if (!op.security) return;
 
-  return op.security.map(def => {
-    const id = Object.keys(def)[0]
-    const scopes = def[id].length ? def[id] : undefined
-    return { id, scopes }
-  })
+  if (op.security.length) {
+    return op.security.map(def => {
+      const id = Object.keys(def)[0];
+      const scopes = def[id].length ? def[id] : undefined;
+      return { id: id, scopes: scopes };
+    });
+  } else if (Object.keys(op.security).length) {
+    return [{ id: Object.keys(op.security)[0] }];
+  }
+}
+
+function getApiSecurity(spec: any): ApiOperationSecurity[] {
+  if (!spec.security) return;
+
+  if (spec.security.length) {
+    return spec.security.map(def => {
+      const id = Object.keys(def)[0];
+      const scopes = def[id].length ? def[id] : undefined;
+      return { id: id, scopes: scopes };
+    });
+  } else if (Object.keys(spec.security).length) {
+    return [{ id: Object.keys(spec.security)[0] }];
+  }
 }
