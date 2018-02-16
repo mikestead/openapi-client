@@ -39,7 +39,7 @@ function getPathOperation(method: HttpMethod, pathInfo, spec: ApiSpec): ApiOpera
   op.group = getOperationGroupName(op)
   delete op.operationId
   op.responses = getOperationResponses(op)
-  op.security = getOperationSecurity(op) || getApiSecurity(spec)
+  op.security = getOperationSecurity(op, spec)
 
   const operation: any = op
   if (operation.consumes) operation.contentTypes = operation.consumes
@@ -66,30 +66,22 @@ function getOperationResponses(op: any): ApiOperationResponse[] {
   })
 }
 
-function getOperationSecurity(op: any): ApiOperationSecurity[] {
-  if (!op.security) return;
+function getOperationSecurity(op: any, spec: any): ApiOperationSecurity[] {
+  let security
 
-  if (op.security.length) {
-    return op.security.map(def => {
-      const id = Object.keys(def)[0];
-      const scopes = def[id].length ? def[id] : undefined;
-      return { id: id, scopes: scopes };
-    });
-  } else if (Object.keys(op.security).length) {
-    return [{ id: Object.keys(op.security)[0] }];
+  if (op.security && op.security.length) {
+    security = op.security
   }
-}
-
-function getApiSecurity(spec: any): ApiOperationSecurity[] {
-  if (!spec.security) return;
-
-  if (spec.security.length) {
-    return spec.security.map(def => {
-      const id = Object.keys(def)[0];
-      const scopes = def[id].length ? def[id] : undefined;
-      return { id: id, scopes: scopes };
-    });
-  } else if (Object.keys(spec.security).length) {
-    return [{ id: Object.keys(spec.security)[0] }];
+  else if (spec.security && spec.security.length) {
+    security = spec.security
   }
+  else {
+    return
+  }
+
+  return security.map(def => {
+    const id = Object.keys(def)[0]
+    const scopes = def[id].length ? def[id] : undefined
+    return { id: id, scopes: scopes }
+  })
 }
