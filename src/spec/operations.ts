@@ -82,6 +82,6 @@ function getOperationSecurity(op: any, spec: any): ApiOperationSecurity[] {
   return security.map(def => {
     const id = Object.keys(def)[0]
     const scopes = def[id].length ? def[id] : undefined
-    return { id: id, scopes: scopes }
+    return { id, scopes: scopes }
   })
 }
