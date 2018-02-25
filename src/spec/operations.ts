@@ -29,6 +29,15 @@ function getPathOperation(method: HttpMethod, pathInfo, spec: ApiSpec): ApiOpera
   const op = Object.assign({ method, path: pathInfo.path, parameters: [] }, pathInfo[method])
   op.id = op.operationId
 
+  let pathParams = spec.paths[pathInfo.path].parameters
+  if (pathParams) {
+    pathParams.forEach(pathParam => {
+      if (!op.parameters.find(p => p.name === pathParam.name)) {
+        op.parameters.push(pathParam)
+      }
+    })
+  }
+
   // if there's no explicit operationId given, create one based on the method and path
   if (!op.id) {
     op.id = method + pathInfo.path
