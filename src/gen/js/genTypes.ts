@@ -53,7 +53,7 @@ function renderTsType(name, def, options) {
   const lines = []
   if (def.description) {
     lines.push(`/**`)
-    lines.push(DOC + def.description.trim().replace(/\n/g, `\n$${DOC}${SP}`))
+    lines.push(DOC + def.description.trim().replace(/\n/g, `\n${DOC}${SP}`))
     lines.push(` */`)
   }
   lines.push(`export interface ${name} {`)
