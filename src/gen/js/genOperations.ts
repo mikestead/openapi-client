@@ -314,7 +314,7 @@ function renderOperationInfo(spec: ApiSpec, op: ApiOperation, options: ClientOpt
 }
 
 function renderSecurityInfo(security: ApiOperationSecurity[]): string[] {
-  return security.map(sec => {
+  return security.map((sec, i) => {
     const scopes = sec.scopes
     const secLines = []
     secLines.push(`${SP.repeat(2)}{`)
@@ -322,7 +322,7 @@ function renderSecurityInfo(security: ApiOperationSecurity[]): string[] {
     if (scopes) {
       secLines.push(`${SP.repeat(3)}scopes: ['${scopes.join(`', '`)}']`)
     }
-    secLines.push(`${SP.repeat(2)}}`)
+    secLines.push(`${SP.repeat(2)}}${i + 1 < security.length ? ',': ''}`)
     return secLines
   }).reduce((a, b) => a.concat(b))
 }
