@@ -25,6 +25,17 @@ function getPathOperations(pathInfo, spec): ApiOperation[] {
     .map(method => getPathOperation(<HttpMethod> method, pathInfo, spec))
 }
 
+function inheritPathParams(op, spec, pathInfo) {
+  let pathParams = spec.paths[pathInfo.path].parameters
+  if (pathParams) {
+    pathParams.forEach(pathParam => {
+      if (!op.parameters.some(p => p.name === pathParam.name && p.in === pathParam.in)) {
+        op.parameters.push(Object.assign({}, pathParam))
+      }
+    })
+  }
+}
+
 function getPathOperation(method: HttpMethod, pathInfo, spec: ApiSpec): ApiOperation {
   const op = Object.assign({ method, path: pathInfo.path, parameters: [] }, pathInfo[method])
   op.id = op.operationId
@@ -32,9 +43,11 @@ function getPathOperation(method: HttpMethod, pathInfo, spec: ApiSpec): ApiOpera
   // if there's no explicit operationId given, create one based on the method and path
   if (!op.id) {
     op.id = method + pathInfo.path
-    op.id = op.id.replace(/[\/{(?\/{)]([^{.])/g, (_, m) => m.toUpperCase());
-    op.id = op.id.replace(/[\/}]/g, '');
+    op.id = op.id.replace(/[\/{(?\/{)]([^{.])/g, (_, m) => m.toUpperCase())
+    op.id = op.id.replace(/[\/}]/g, '')
   }
+
+  inheritPathParams(op, spec, pathInfo)
 
   op.group = getOperationGroupName(op)
   delete op.operationId
