@@ -1,6 +1,6 @@
 # OpenAPI Client
 
-Generate ES6 or Typescript service integration code from an OpenAPI spec.
+Generate ES6 or Typescript service integration code from an OpenAPI 2.0 spec.
 
 Also supports optional Redux action creator generation.
 
