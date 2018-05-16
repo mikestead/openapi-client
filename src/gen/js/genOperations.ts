@@ -286,6 +286,16 @@ function renderRequestCall(op: ApiOperation, options: ClientOptions) {
   return [ `${SP}return gateway.request(${op.id}Operation${params})${ST}`, '}' ]
 }
 
+function renderParamType(param){
+  const v = getTSParamType(param)
+  switch(v){
+    case 'file':
+      return 'File'
+    default:
+      return v
+  }
+}
+
 function renderOperationParamType(spec: ApiSpec, op: ApiOperation, options: ClientOptions): string[] {
   const optional = op.parameters.filter(param => !param.required)
   if (!optional.length) return []
@@ -297,7 +307,7 @@ function renderOperationParamType(spec: ApiSpec, op: ApiOperation, options: Clie
       lines.push(`${SP}${DOC}` + (param.description || '').trim().replace(/\n/g, `\n${SP}${DOC}${SP}`))
       lines.push(`${SP} */`)
     }
-    lines.push(`${SP}${getParamName(param.name)}?: ${getTSParamType(param)}${ST}`)
+    lines.push(`${SP}${getParamName(param.name)}?: ${renderParamType(param)}${ST}`)
   })
   lines.push('}')
   lines.push('')
