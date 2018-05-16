@@ -238,7 +238,24 @@ function groupParams(groups: any, param: ApiOperationParam): any {
   const group = groups[param.in] || []
   const name = getParamName(param.name)
   const realName = /^[_$a-z0-9]+$/gim.test(param.name) ? param.name : `'${param.name}'`
-  const value = param.required ? name : 'options.' + name
+  const value = param.required ? name : 'options.' + name + '||' + [param.type].map(v => {
+      switch(v) {
+        case 'file':
+          return 'undefined'
+        case 'string':
+          return "''"
+        case 'number':
+          return '-1'
+        case 'boolean':
+          return 'false'
+        case 'integer':
+          return '-1'
+        case 'array':
+          return '[]'
+        default:
+          return 'undefined'
+      }
+  })
 
   if (param.type === 'array') {
     if (!param.collectionFormat) throw new Error(`param ${param.name} must specify an array collectionFormat`)
