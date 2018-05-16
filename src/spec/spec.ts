@@ -22,7 +22,7 @@ function loadJson(src: string): Promise<ApiSpec> {
       .then(response => response.json())
   } else if (String(process) === '[object process]') {
     return readFile(src)
-      .then(contents => parseFileContents(contents, src))
+      .then(contents => parseFileContents(contents, src) as ApiSpec)
   } else {
     throw new Error(`Unable to load api at '${src}'`)
   }

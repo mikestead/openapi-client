@@ -234,7 +234,7 @@ export interface FetchHeaders {
 export declare enum FetchResponseType { 'basic', 'cors', 'default', 'error', 'opaque' }${ST}
 
 export class ServiceError extends Error {
-  status: number${ST}
+  status: number = -1${ST} 
 }
 
 /**
