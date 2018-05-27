@@ -98,7 +98,7 @@ function getAccountToken(security) {
 
 ### Using generated Redux action creators
 
-You can use the generated API client directly. However, if you pass `--redux` or `redux: true` to `openapi-client`, you will have generated Redux action creators to call your API (using a wrapper around `fetch`). The following example assumes that you're using `react-redux` to wrap action creators in `dispatch`.
+You can use the generated API client directly. However, if you pass `--redux` or `redux: true` to `openapi-client`, you will have generated Redux action creators to call your API (using a wrapper around `fetch`). The following example assumes that you're using `react-redux` to wrap action creators in `dispatch`. You also need to use for example `redux-thunk` as middleware to allow async actions. 
 
 In your component:
 
