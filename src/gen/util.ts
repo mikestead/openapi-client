@@ -32,6 +32,50 @@ export function camelToUppercase(value: string): string {
   return value.replace(/([A-Z]+)/g, '_$1').toUpperCase()
 }
 
+export function sanitizeIdentifier(value: string): string {
+  return value.replace(/[\(\)\[\]\/ .-]/g, '')
+}
+
+export function isReserved(value: string): boolean {
+  const reservedWords = [
+    'break',
+    'case',
+    'catch',
+    'class',
+    'const',
+    'continue',
+    'debugger',
+    'default',
+    'delete',
+    'do',
+    'else',
+    'export',
+    'extends',
+    'finally',
+    'for',
+    'function',
+    'if',
+    'import',
+    'in',
+    'instanceof',
+    'new',
+    'return',
+    'super',
+    'switch',
+    'this',
+    'throw',
+    'try',
+    'typeof',
+    'var',
+    'void',
+    'while',
+    'with',
+    'yield'
+  ]
+
+  return reservedWords.indexOf(value) >= 0
+}
+
 export function getBestResponse(op: ApiOperation): ApiOperationResponse {
   const NOT_FOUND = 100000
   const lowestCode = op.responses.reduce((code, resp) => {

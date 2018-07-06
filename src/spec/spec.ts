@@ -22,7 +22,7 @@ function loadJson(src: string): Promise<ApiSpec> {
       .then(response => response.json())
   } else if (String(process) === '[object process]') {
     return readFile(src)
-      .then(contents => parseFileContents(contents, src))
+      .then(contents => parseFileContents<ApiSpec>(contents, src))
   } else {
     throw new Error(`Unable to load api at '${src}'`)
   }
@@ -34,7 +34,7 @@ function readFile(filePath: string): Promise<string> {
       err ? rej(err) : res(contents)))
 }
 
-function parseFileContents(contents: string, path: string): Object {
+function parseFileContents<T>(contents: string, path: string): T {
   return /.ya?ml$/i.test(path)
     ? YAML.safeLoad(contents)
     : JSON.parse(contents)

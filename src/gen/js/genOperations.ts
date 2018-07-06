@@ -1,4 +1,4 @@
-import { writeFileSync, join, groupOperationsByGroupName, camelToUppercase, getBestResponse } from '../util'
+import { writeFileSync, join, groupOperationsByGroupName, sanitizeIdentifier, isReserved, getBestResponse } from '../util'
 import { DOC, SP, ST, getDocType, getTSParamType } from './support'
 
 export default function genOperations(spec: ApiSpec, operations: ApiOperation[], options: ClientOptions) {
@@ -168,45 +168,9 @@ function getParamName(name: string): string {
 }
 
 function escapeReservedWords(name: string): string {
-  let escapedName = name
+  let escapedName = sanitizeIdentifier(name)
 
-  const reservedWords = [
-    'break',
-    'case',
-    'catch',
-    'class',
-    'const',
-    'continue',
-    'debugger',
-    'default',
-    'delete',
-    'do',
-    'else',
-    'export',
-    'extends',
-    'finally',
-    'for',
-    'function',
-    'if',
-    'import',
-    'in',
-    'instanceof',
-    'new',
-    'return',
-    'super',
-    'switch',
-    'this',
-    'throw',
-    'try',
-    'typeof',
-    'var',
-    'void',
-    'while',
-    'with',
-    'yield'
-  ]
-
-  if (reservedWords.indexOf(name) >= 0) {
+  if (isReserved(escapedName)) {
     escapedName = name + '_'
   }
   return escapedName

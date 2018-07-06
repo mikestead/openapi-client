@@ -4,6 +4,9 @@
         "rootDir": "./src",
         "target": "es6",
         "module": "commonjs",
+        "types": [
+            "node"
+        ],
         "removeComments": false
     },
     "exclude": [
