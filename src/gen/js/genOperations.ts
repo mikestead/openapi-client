@@ -161,7 +161,7 @@ function getParamSignature(param: ApiOperationParam, options: ClientOptions): st
   return signature
 }
 
-function getParamName(name: string): string {
+export function getParamName(name: string): string {
   const parts = name.split(/[_-\s!@\#$%^&*\(\)]/g).filter(n => !!n)
   const reduced = parts.reduce((name, p) => `${name}${p[0].toUpperCase()}${p.slice(1)}`)
   return escapeReservedWords(reduced)

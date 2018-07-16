@@ -1,6 +1,6 @@
 import { writeFileSync, join, groupOperationsByGroupName, camelToUppercase, getBestResponse } from '../util'
 import { DOC, SP, ST, getDocType, getTSParamType } from './support'
-import { renderParamSignature, renderOperationGroup } from './genOperations'
+import { renderParamSignature, renderOperationGroup, getParamName } from './genOperations'
 
 export default function genReduxActions(spec: ApiSpec, operations: ApiOperation[], options: ClientOptions) {
   const files = genReduxActionGroupFiles(spec, operations, options)
@@ -43,7 +43,7 @@ function renderReduxActionBlock(spec: ApiSpec, op: ApiOperation, options: Client
   let paramSignature = renderParamSignature(op, options, `${op.group}.`)
   paramSignature += `${paramSignature ? ', ' : ''}${infoParam}`
   const required = op.parameters.filter(param => param.required)
-  let params = required.map(param => param.name).join(', ')
+  let params = required.map(param => getParamName(param.name)).join(', ')
   if (required.length < op.parameters.length) {
     if (required.length) params += ', options'
     else params = 'options'
