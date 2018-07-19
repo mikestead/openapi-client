@@ -52,7 +52,7 @@ function renderOperation(spec: ApiSpec, op: ApiOperation, options: ClientOptions
   return lines
 }
 
-function renderOperationDocs(op: ApiOperation): string[] {
+export function renderOperationDocs(op: ApiOperation): string[] {
   const lines = []
   lines.push(`/**`)
   join(lines, renderDocDescription(op))

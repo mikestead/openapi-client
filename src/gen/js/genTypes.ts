@@ -270,6 +270,7 @@ function renderTypeDoc(name: string, def: any): string[] {
   if (propLines.length) lines.push(`${DOC}`)
   join(lines, propLines)
   lines.push(' */')
+  lines.push(`const ${name}=null`)
   lines.push('')
   return lines
 }
