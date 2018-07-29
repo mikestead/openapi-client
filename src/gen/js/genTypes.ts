@@ -142,7 +142,7 @@ export interface OperationParamGroups {
   header?: {[key: string]: string}${ST}
   path?: {[key: string]: string|number|boolean}${ST}
   query?: {[key: string]: string|string[]|number|boolean}${ST}
-  formData?: {[key: string]: string|number|boolean}${ST}
+  formData?: {[key: string]: string|number|boolean|File|undefined}${ST}
   body?: any${ST}
 }
 
@@ -234,7 +234,7 @@ export interface FetchHeaders {
 export declare enum FetchResponseType { 'basic', 'cors', 'default', 'error', 'opaque' }${ST}
 
 export class ServiceError extends Error {
-  status: number${ST}
+  status: number = -1${ST} 
 }
 
 /**

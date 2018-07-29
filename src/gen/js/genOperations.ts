@@ -238,7 +238,24 @@ function groupParams(groups: any, param: ApiOperationParam): any {
   const group = groups[param.in] || []
   const name = getParamName(param.name)
   const realName = /^[_$a-z0-9]+$/gim.test(param.name) ? param.name : `'${param.name}'`
-  const value = param.required ? name : 'options.' + name
+  const value = param.required ? name : 'options.' + name + '||' + [param.type].map(v => {
+      switch(v) {
+        case 'file':
+          return 'undefined'
+        case 'string':
+          return "''"
+        case 'number':
+          return '-1'
+        case 'boolean':
+          return 'false'
+        case 'integer':
+          return '-1'
+        case 'array':
+          return '[]'
+        default:
+          return 'undefined'
+      }
+  })
 
   if (param.type === 'array') {
     if (!param.collectionFormat) throw new Error(`param ${param.name} must specify an array collectionFormat`)
@@ -269,6 +286,16 @@ function renderRequestCall(op: ApiOperation, options: ClientOptions) {
   return [ `${SP}return gateway.request(${op.id}Operation${params})${ST}`, '}' ]
 }
 
+function renderParamType(param){
+  const v = getTSParamType(param)
+  switch(v){
+    case 'file':
+      return 'File'
+    default:
+      return v
+  }
+}
+
 function renderOperationParamType(spec: ApiSpec, op: ApiOperation, options: ClientOptions): string[] {
   const optional = op.parameters.filter(param => !param.required)
   if (!optional.length) return []
@@ -280,7 +307,7 @@ function renderOperationParamType(spec: ApiSpec, op: ApiOperation, options: Clie
       lines.push(`${SP}${DOC}` + (param.description || '').trim().replace(/\n/g, `\n${SP}${DOC}${SP}`))
       lines.push(`${SP} */`)
     }
-    lines.push(`${SP}${getParamName(param.name)}?: ${getTSParamType(param)}${ST}`)
+    lines.push(`${SP}${getParamName(param.name)}?: ${renderParamType(param)}${ST}`)
   })
   lines.push('}')
   lines.push('')

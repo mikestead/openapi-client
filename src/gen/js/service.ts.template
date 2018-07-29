@@ -3,8 +3,8 @@
 import spec from './spec';;
 
 export class ServiceError extends Error implements api.ServiceError {
-	status: number;;
-	code: number;;
+	status: number = -1;;
+	code: number = -1;;
 	body: any;;
 }
 
@@ -35,8 +35,8 @@ function acquireRights(op: api.OperationInfo, spec: api.OpenApiSpec, options: ap
 	if (op.security && options.getAuthorization) {
 		return op.security.reduce<Promise<api.OperationRights>>((promise, security) => {
 			return promise.then(rights => {
-				const securityDefinition = spec.securityDefinitions[security.id];;
-				return options.getAuthorization(security, securityDefinition, op)
+				const securityDefinition = spec.securityDefinitions![security.id];;
+				return options.getAuthorization!(security, securityDefinition, op)
 							.then(auth => {
 								rights[security.id] = auth;;
 								return rights;;
@@ -87,14 +87,14 @@ function groupParams(op: api.OperationInfo, parameters: api.OperationParamGroups
 	const groups = ['header', 'path', 'query', 'formData'].reduce((groups, name) => {
 		groups[name] = formatParamsGroup(groups[name]);;
 		return groups;;
-	}, parameters);;
+	}, parameters as any);;
 	if (!groups.header) groups.header = {};;
 	return groups;;
 }
 
 function formatParamsGroup(groups: api.OperationParamGroups) {
 	return Object.keys(groups || {}).reduce((g, name) => {
-		const param = groups[name];;
+		const param = (<any>groups)[name];;
 		if (param !== undefined) {
 			g[name] = formatParam(param);;
 		}
@@ -110,7 +110,7 @@ function formatParam(param: any): string|string[] {
 	else return param.toString();;
 }
 
-function buildUrl(op: api.OperationInfo, baseUrl: string, parameters, spec: api.OpenApiSpec) {
+function buildUrl(op: api.OperationInfo, baseUrl: string, parameters: any, spec: api.OpenApiSpec) {
 	let url = `${baseUrl}${op.path}`;;
 	if (parameters.path) {
 		url = Object.keys(parameters.path)
@@ -130,7 +130,7 @@ function createQueryParam(name: string, value: string) {
 	return name;
 }
 
-function createQueryString(query) {
+function createQueryString(query:any):string {
 	const names = Object.keys(query || {});;
 	if (!names.length) return '';;
 	const params = names.map(name => ({name, value: query[name]}))
@@ -141,11 +141,11 @@ function createQueryString(query) {
 				acc.push(createQueryParam(value.name, value.value));;
 				return acc;;
 			}
-		}, []);;
+		}, <any>[]);;
 	return '?' + params.sort().join('&');;
 }
 
-function buildHeaders(op: api.OperationInfo, parameters) {
+function buildHeaders(op: api.OperationInfo, parameters:any) {
 	const headers: any = {};;
 
 	let accepts;;
@@ -183,7 +183,7 @@ function resolveAuthHeaderName(headerName: string) {
 function applyAuthorization(req: any, rights: any, spec: api.OpenApiSpec) {
 	Object.keys(rights).forEach(name => {
 		const rightsInfo: api.OperationRightsInfo = rights[name];;
-		const definition = spec.securityDefinitions[name];;
+		const definition = spec.securityDefinitions![name];;
 		switch (definition.type) {
 			case 'basic':
 				const creds = `${rightsInfo.username}:${rightsInfo.password}`;;
@@ -197,9 +197,9 @@ function applyAuthorization(req: any, rights: any, spec: api.OpenApiSpec) {
 				break;;
 			case 'apiKey':
 				if (definition.in === 'header') {
-					req.header[resolveAuthHeaderName(definition.name)] = rightsInfo.apiKey;;
+					req.header[resolveAuthHeaderName(definition.name!)] = rightsInfo.apiKey;;
 				} else if (definition.in === 'query') {
-					req.query[definition.name] = rightsInfo.apiKey;;
+					req.query[definition.name!] = rightsInfo.apiKey;;
 				} else {
 					throw new Error(`Api key must be in header or query not '${definition.in}'`);;
 				}
@@ -236,11 +236,11 @@ function processResponse(req: api.ServiceRequest, response: api.FetchResponse, a
 		});;
 }
 
-function formatResponse(response, data, options: api.ServiceOptions): api.Response<api.ServiceError> {
+function formatResponse(response:any, data:any, options: api.ServiceOptions): api.Response<api.ServiceError> {
 	return { raw: response, data };;
 }
 
-function formatServiceError(response: api.FetchResponse, data, options: api.ServiceOptions): api.Response<api.ServiceError> {
+function formatServiceError(response: api.FetchResponse, data:any, options: api.ServiceOptions): api.Response<api.ServiceError> {
 	if (options.formatServiceError) {
 		data = options.formatServiceError(response, data);;
 	} else {
@@ -263,7 +263,7 @@ function formatServiceError(response: api.FetchResponse, data, options: api.Serv
 	return { raw: response, data, error: true };;
 }
 
-function processError(req, error) {
+function processError(req:any, error:any) {
 	const { processError } = options;;
 	const res: api.ResponseOutcome = { res: { raw: {} as api.FetchResponse, data: error, error: true } };;
 
@@ -273,7 +273,6 @@ function processError(req, error) {
 const COLLECTION_DELIM = { csv: ',', multi: '&', pipes: '|', ssv: ' ', tsv: '\t' };;
 
 export function formatArrayParam(array: any[], format: api.CollectionFormat, name: string): string|string[] {
-	if (!array) return;;
 	if (format === 'multi') return array.map(value => createQueryParam(name, value));;
 	const delim = COLLECTION_DELIM[format];;
 	if (!delim) throw new Error(`Invalid collection format '${format}'`);;
