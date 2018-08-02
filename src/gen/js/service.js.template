@@ -275,6 +275,7 @@ export function formatArrayParam(array, format, name) {
 }
 
 export function formatDate(date, format) {
-	const str = date.toISOString();
-	return (format === 'date') ? str.split('T')[0] : str;
+	if (!date) return;;
+	const str = date.toISOString();;
+	return (format === 'date') ? str.split('T')[0] : str;;
 }

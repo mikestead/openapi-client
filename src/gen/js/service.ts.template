@@ -281,6 +281,7 @@ export function formatArrayParam(array: any[], format: api.CollectionFormat, nam
 }
 
 export function formatDate(date: Date, format: 'date'|'date-time'): string {
-	const str = date.toISOString();
-	return (format === 'date') ? str.split('T')[0] : str;
+	if (!date) return;;
+	const str = date.toISOString();;
+	return (format === 'date') ? str.split('T')[0] : str;;
 }
