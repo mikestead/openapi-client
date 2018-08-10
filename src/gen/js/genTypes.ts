@@ -202,9 +202,11 @@ export interface ServiceOptions {
    */
   processRequest?: (op: OperationInfo, reqInfo: RequestInfo) => RequestInfo${ST}
   /**
-   * If you need some type of Request retry behavior this function is the place to do it.
+   * If you need some type of request retry behavior this function
+   * is the place to do it.
    * 
-   * The response is promise based so simply resolve the "res" parameter if you're happy with it e.g.
+   * The response is promise based so simply resolve the "res" parameter
+   * if you're happy with it e.g.
    * 
    *     if (!res.error) return Promise.resolve({ res });
    * 
@@ -212,22 +214,26 @@ export interface ServiceOptions {
    * 
    *     return Promise.resolve({ res, retry: true })
    * 
-   * You can of course do other things before this, like refresh an auth token if the error indicated it expired.
+   * You can of course do other things before this, like refresh an auth
+   * token if the error indicated it expired.
    * 
    * The "attempt" param will tell you how many times a retry has been attempted.
    */
   processResponse?: (req: api.ServiceRequest, res: Response<any>, attempt: number) => Promise<api.ResponseOutcome>${ST}
   /**
-   * If a fetch request fails this function gives you a chance to process that error before it's
-   * returned up the promise chain to the original caller.
+   * If a fetch request fails this function gives you a chance to process
+   * that error before it's returned up the promise chain to the original caller.
    */
   processError?: (req: api.ServiceRequest, res: api.ResponseOutcome) => Promise<api.ResponseOutcome>${ST}
   /**
-   * By default the authorization header name is "Authorization". This property allows you to override it.
+   * By default the authorization header name is "Authorization".
+   * This property allows you to override it.
    * 
-   * One place this can come up is where your API is under the same host as a website it powers,
-   * If the website has Basic Auth in place then some browsers will override your Authorization: Bearer <token>
-   * header with the Basic Auth value when calling your API. To counter this we can change the header, e.g.
+   * One place this can come up is where your API is under the same host as
+   * a website it powers. If the website has Basic Auth in place then some
+   * browsers will override your "Authorization: Bearer <token>" header with
+   * the Basic Auth value when calling your API. To counter this we can change
+   * the header, e.g.
    * 
    *     authorizationHeader = "X-Authorization"
    * 
