@@ -43,8 +43,8 @@ function getPathOperation(method: HttpMethod, pathInfo, spec: ApiSpec): ApiOpera
   // if there's no explicit operationId given, create one based on the method and path
   if (!op.id) {
     op.id = method + pathInfo.path
-    op.id = op.id.replace(/[\/{(?\/{)]([^{.])/g, (_, m) => m.toUpperCase())
-    op.id = op.id.replace(/[\/}]/g, '')
+    op.id = op.id.replace(/[\/{(?\/{)\-]([^{.])/g, (_, m) => m.toUpperCase())
+    op.id = op.id.replace(/[\/}\-]/g, '')
   }
 
   inheritPathParams(op, spec, pathInfo)
