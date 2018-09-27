@@ -39,6 +39,7 @@ Options:
   -o, --outDir <dir>      The path to the directory where files should be generated
   -l, --language <js|ts>  The language of code to generate
   --redux                 True if wanting to generate redux action creators
+  --vuex                  True if wanting to generate vuex actions
 ```
 
 ### Code

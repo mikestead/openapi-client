@@ -3,6 +3,7 @@ interface ClientOptions {
   outDir: string
   language: 'js'|'ts'
   redux?: boolean
+  vuex?: boolean
   indent?: '2'|'4'|'tab'
   semicolon?: boolean
 }
