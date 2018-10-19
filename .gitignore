@@ -1,6 +1,4 @@
 .vscode
 dist
 node_modules
-typings
-/npm-debug.log
 .DS_Store
