@@ -4,7 +4,8 @@
         "rootDir": "./src",
         "target": "es6",
         "module": "commonjs",
-        "removeComments": false
+        "removeComments": false,
+        "skipLibCheck": true
     },
     "exclude": [
         "node_modules",
