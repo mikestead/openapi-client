@@ -1,6 +1,9 @@
 {
+    "linterOptions": {
+        "exclude": ["node_modules/**"]
+    },
     "rules": {
-      "semicolon": [true, "never"],
-      "variable-name": [true, "ban-keywords", "check-format"]
+        "semicolon": [true, "never"],
+        "variable-name": [true, "ban-keywords", "check-format"]
     }
 }
