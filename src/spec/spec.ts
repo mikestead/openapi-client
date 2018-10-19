@@ -16,7 +16,7 @@ export function resolveSpec(src: string | Object, options?: SpecOptions): Promis
   }
 }
 
-function loadJson(src: string): Promise<ApiSpec> {
+function loadJson(src: string): Promise<ApiSpec | any> {
   if (/^https?:\/\//im.test(src)) {
     return fetch(src)
       .then(response => response.json())
