@@ -28,6 +28,7 @@
     "predev": "yarn run init",
     "dev": "tsc -w",
     "init": "yarn run clean && yarn run copy:template",
+    "client": "ts-node --files src/cli.ts",
     "clean": "shx rm -rf ./dist",
     "copy:template": "shx mkdir -p ./dist/gen/js && yarn run copy:service-ts && yarn run copy:service-js",
     "copy:service-ts": "shx cp ./src/gen/js/service.ts.template ./dist/gen/js/service.ts.template",
@@ -64,6 +65,7 @@
     "expect": "^23.6.0",
     "mocha": "^5.2.0",
     "shx": "^0.3.2",
+    "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "typescript": "^3.1.3"
   }
