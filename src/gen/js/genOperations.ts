@@ -133,17 +133,32 @@ export function renderParamSignature(op: ApiOperation, options: ClientOptions, p
   return funcParams.map(p => p.join(': ')).join(', ')
 }
 
-function renderRequiredParamsSignature(required: ApiOperationParam[], options: ClientOptions): string[][] {
+export function renderDestructuredParamSignature(op: ApiOperation, options: ClientOptions, pkg?: string, bare = false): string {
+  const signature = renderParamSignature(op, options, pkg);
+  const params = op.parameters
+  const required = params.filter(param => param.required)
+  const optional = params.filter(param => !param.required)
+  const funcParams = renderRequiredParamsSignature(required, options, false)
+  const optParam = renderOptionalParamsSignature(op, optional, options, pkg, false)
+  if (optParam.length) funcParams.push(optParam)
+  const destructuredParams = funcParams.map(p => p[0]).join(', ')
+
+  if (bare) return destructuredParams;
+  if (options.language === 'ts') return `{ ${destructuredParams} }: { ${signature} }`
+  return `{ ${destructuredParams} }`
+}
+
+function renderRequiredParamsSignature(required: ApiOperationParam[], options: ClientOptions, typed = true): string[][] {
   return required.reduce<string[][]>((a, param) => {
-    a.push(getParamSignature(param, options))
+    a.push(getParamSignature(param, options, typed))
     return a
   }, [])
 }
 
-function renderOptionalParamsSignature(op: ApiOperation, optional: ApiOperationParam[], options: ClientOptions, pkg?: string) {
+function renderOptionalParamsSignature(op: ApiOperation, optional: ApiOperationParam[], options: ClientOptions, pkg?: string, typed = true) {
   if (!optional.length) return []
   if (!pkg) pkg = ''
-  const s = options.language === 'ts' ? '?' : ''
+  const s = options.language === 'ts' && typed ? '?' : ''
   const param = [`options${s}`]
   if (options.language === 'ts') param.push(`${pkg}${op.id[0].toUpperCase() + op.id.slice(1)}Options`)
   return param
@@ -155,9 +170,9 @@ function renderReturnSignature(op: ApiOperation, options: ClientOptions): string
   return `: Promise<api.Response<${getTSParamType(response)}>>`
 }
 
-function getParamSignature(param: ApiOperationParam, options: ClientOptions): string[] {
+function getParamSignature(param: ApiOperationParam, options: ClientOptions, typed = true): string[] {
   const signature = [getParamName(param.name)]
-  if (options.language === 'ts') signature.push(getTSParamType(param))
+  if (options.language === 'ts' && typed) signature.push(getTSParamType(param))
   return signature
 }
 

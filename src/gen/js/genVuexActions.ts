@@ -1,6 +1,6 @@
 import { writeFileSync, join, groupOperationsByGroupName, camelToUppercase, getBestResponse } from '../util'
 import { DOC, SP, ST, getDocType, getTSParamType } from './support'
-import { renderParamSignature, renderOperationGroup } from './genOperations'
+import { renderDestructuredParamSignature, renderOperationGroup } from './genOperations'
 
 export default function genVuexActions(spec: ApiSpec, operations: ApiOperation[], options: ClientOptions) {
   const files = genVuexActionGroupFiles(spec, operations, options)
@@ -37,10 +37,11 @@ export default {`.trim()
 }
 
 function renderVuexActionBlock(spec: ApiSpec, op: ApiOperation, options: ClientOptions): string {
-  const lines = []
   const isTs = options.language === 'ts'
   const actionComplete = camelToUppercase(op.id)
   const actionError = camelToUppercase(op.id) + '_ERROR'
+  let paramSignature = renderDestructuredParamSignature(op, options, `${op.group}.`)
+  let actionParamSignature = renderDestructuredParamSignature(op, options, `${op.group}.`, true)
   const required = op.parameters.filter(param => param.required)
   let params = required.map(param => param.name).join(', ')
   if (required.length < op.parameters.length) {
@@ -48,19 +49,17 @@ function renderVuexActionBlock(spec: ApiSpec, op: ApiOperation, options: ClientO
     else params = 'options'
   }
 
-  const response = getBestResponse(op)
-  const returnType = response ? getTSParamType(response) : 'any'
-  return `${isTs ? `  type ${actionComplete} = ${returnType}${ST}`: ''}
-  async ${op.id}({ commit }, options)${isTs? ': any' : ''} {
-    const response = await ${op.group}.${op.id}(${params});
+  return `
+async ${op.id}({ commit }, ${paramSignature})${isTs ? ': Promise<any>' : ''} {
+  const response = await ${op.group}.${op.id}(${params});
 
-    if (response.error) {
-      commit('${actionError}', { response, options });
-    } else {
-      commit('${actionComplete}', { response, options });
-    }
+  if (response.error) {
+    commit('${actionError}', { response, ${actionParamSignature} });
+  } else {
+    commit('${actionComplete}', { response, ${actionParamSignature} });
+  }
 
-    return response;
-  },
-  `.replace(/  /g, SP)
+  return response;
+},
+`.replace(/  /g, SP);
 }
