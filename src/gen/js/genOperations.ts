@@ -68,8 +68,9 @@ function renderDocDescription(op: ApiOperation) {
 
 function renderDocParams(op: ApiOperation) {
   const params = op.parameters
-  if (!params.length) return []
-
+  if (!params.length) {
+    return [renderDocReturn(op)]
+  }
   const required = params.filter(param => param.required)
   const optional = params.filter(param => !param.required)
 
