@@ -124,7 +124,7 @@ export interface ServiceOptions {
    */
   getAuthorization?: (security: OperationSecurity, 
                       securityDefinitions: any,
-                      op: OperationInfo) => Promise<OperationRights>${ST}
+                      op: OperationInfo) => Promise<OperationRightsInfo>${ST}
   /**
    * Given an error response, custom format and return a ServiceError
    */
