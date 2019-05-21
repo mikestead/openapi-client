@@ -1,5 +1,5 @@
-import { writeFileSync, join } from '../util'
-import { DOC, SP, ST, getDocType, getTSParamType, formatDocDescription } from './support'
+import { writeFileSync, join, sanitizeIdentifier, isReserved } from '../util'
+import { DOC, SP, ST, getDocType, getTSParamType } from './support'
 
 export default function genTypes(spec: ApiSpec, options: ClientOptions) {
   const file = genTypesFile(spec, options)
@@ -50,6 +50,8 @@ function renderTsType(name, def, options) {
     return []
   }
 
+  name = sanitizeIdentifier(name)
+
   const lines = []
   if (def.description) {
     lines.push(`/**`)
@@ -89,7 +91,10 @@ function renderTsInheritance(name: string, allOf: any[], options: ClientOptions)
 }
 
 function renderTsTypeProp(prop: string, info: any, required: boolean): string[] {
-  const lines = []
+
+  if (isReserved(prop) || !/^[a-z0-9_]+$/i.test(prop)) prop = `'${prop}'`
+
+  const lines = []  
   const type = getTSParamType(info, true)
   if (info.description) {
     lines.push(`${SP}/**`)
@@ -316,6 +321,8 @@ function renderTypeDoc(name: string, def: any): string[] {
     console.warn(`Unable to render ${name} ${def.type}, skipping.`)
     return []
   }
+
+  name = sanitizeIdentifier(name)
 
   const group = 'types'
   const lines = [

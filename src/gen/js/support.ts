@@ -1,3 +1,5 @@
+import { sanitizeIdentifier } from '../util'
+
 export const DOC = ' * '
 export const DEFAULT_SP = '  '
 export let SP = DEFAULT_SP
@@ -33,8 +35,8 @@ export function getDocType(param: any): string {
   if (!param) {
     return 'object'
   } else if (param.$ref) {
-    const type = param.$ref.split('/').pop()
-    return `module:types.${type}`
+    const type = sanitizeIdentifier(param.$ref.split('/').pop())
+    return `module:api.${type}`
   } else if (param.schema) {
     return getDocType(param.schema)
   } else if (param.type === 'array') {
@@ -63,7 +65,7 @@ export function getTSParamType(param: any, inTypesModule?: boolean): string {
     else if (param.type === 'number') return `${param.enum.join(`|`)}`
   }
   if (param.$ref) {
-    const type = param.$ref.split('/').pop()
+    const type = sanitizeIdentifier(param.$ref.split('/').pop())
     return inTypesModule 
       ? type
       : `api.${type}`
