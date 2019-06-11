@@ -37,6 +37,7 @@ import * as ${name} from '../${name}'${ST}
 function renderReduxActionBlock(spec: ApiSpec, op: ApiOperation, options: ClientOptions): string {
   const lines = []
   const isTs = options.language === 'ts'
+  let hasOptions=''
   const actionStart = camelToUppercase(op.id) + '_START'
   const actionComplete = camelToUppercase(op.id)
   const infoParam = isTs ? 'info?: any' : 'info'
@@ -45,6 +46,7 @@ function renderReduxActionBlock(spec: ApiSpec, op: ApiOperation, options: Client
   const required = op.parameters.filter(param => param.required)
   let params = required.map(param => getParamName(param.name)).join(', ')
   if (required.length < op.parameters.length) {
+    hasOptions=', options'
     if (required.length) params += ', options'
     else params = 'options'
   }
@@ -58,7 +60,7 @@ ${isTs ? `export type ${actionComplete} = ${returnType}${ST}`: ''}
 
 export function ${op.id}(${paramSignature})${isTs? ': any' : ''} {
   return dispatch => {
-    dispatch({ type: ${actionStart}, meta: { info } })${ST}
+    dispatch({ type: ${actionStart}, meta: { info${hasOptions} } })${ST}
     return ${op.group}.${op.id}(${params})
       .then(response => dispatch({
         type: ${actionComplete},
@@ -66,7 +68,7 @@ export function ${op.id}(${paramSignature})${isTs? ': any' : ''} {
         error: response.error,
         meta: {
           res: response.raw,
-          info
+          info${hasOptions}
         }
       }))${ST}
   }${ST}
