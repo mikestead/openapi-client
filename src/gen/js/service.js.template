@@ -1,12 +1,14 @@
 // Auto-generated, edits will be overwritten
-import spec from './spec';;
+import specification from './spec';;
 
 export class ServiceError extends Error {}
 
 let options = {};;
+let spec = specification;;
 
-export function init(serviceOptions) {
+export function init(serviceOptions, apiSpec = spec) {
 	options = serviceOptions;;
+	spec = apiSpec;;
 }
 
 export function request(op, parameters, attempt) {

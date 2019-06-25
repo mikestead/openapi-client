@@ -1,6 +1,6 @@
 /// <reference path="../types.ts"/>
 // Auto-generated, edits will be overwritten
-import spec from './spec';;
+import specification from './spec';;
 
 export class ServiceError extends Error implements api.ServiceError {
 	status: number;;
@@ -9,9 +9,11 @@ export class ServiceError extends Error implements api.ServiceError {
 }
 
 let options: api.ServiceOptions = {};;
+let spec = specification;;
 
-export function init(serviceOptions: api.ServiceOptions) {
+export function init(serviceOptions: api.ServiceOptions, apiSpec = spec) {
 	options = serviceOptions;;
+	spec = apiSpec;;
 }
 
 export function request(op: api.OperationInfo, parameters?: api.OperationParamGroups, attempt = 1): Promise<any> {
