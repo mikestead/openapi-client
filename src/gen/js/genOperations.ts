@@ -153,7 +153,7 @@ function renderOptionalParamsSignature(op: ApiOperation, optional: ApiOperationP
 function renderReturnSignature(op: ApiOperation, options: ClientOptions): string {
   if (options.language !== 'ts') return ''
   const response = getBestResponse(op)
-  return `: Promise<api.Response<${getTSParamType(response)}>>`
+  return `: Promise<${getTSParamType(response)}>`
 }
 
 function getParamSignature(param: ApiOperationParam, options: ClientOptions): string[] {
