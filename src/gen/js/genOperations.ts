@@ -68,8 +68,9 @@ function renderDocDescription(op: ApiOperation) {
 
 function renderDocParams(op: ApiOperation) {
   const params = op.parameters
-  if (!params.length) return []
-
+  if (!params.length) {
+    return [renderDocReturn(op)]
+  }
   const required = params.filter(param => param.required)
   const optional = params.filter(param => !param.required)
 
@@ -152,7 +153,7 @@ function renderOptionalParamsSignature(op: ApiOperation, optional: ApiOperationP
 function renderReturnSignature(op: ApiOperation, options: ClientOptions): string {
   if (options.language !== 'ts') return ''
   const response = getBestResponse(op)
-  return `: Promise<api.Response<${getTSParamType(response)}>>`
+  return `: Promise<${getTSParamType(response)}>`
 }
 
 function getParamSignature(param: ApiOperationParam, options: ClientOptions): string[] {
