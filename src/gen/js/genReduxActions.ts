@@ -29,6 +29,7 @@ function renderHeader(name: string, spec: ApiSpec, options: ClientOptions): stri
 ${options.language === 'ts' && spec.definitions ? '/// <reference path="../types.ts"/>': ''}
 /** @module action/${name} */
 // Auto-generated, edits will be overwritten
+import { createAction } from 'redux-actions'
 import * as ${name} from '../${name}'${ST}
 `.trim()
   return code
@@ -38,6 +39,8 @@ function renderReduxActionBlock(spec: ApiSpec, op: ApiOperation, options: Client
   const lines = []
   const isTs = options.language === 'ts'
   const actionStart = camelToUppercase(op.id) + '_START'
+  const actionSuccess = camelToUppercase(op.id) + '_SUCCESS'
+  const actionError = camelToUppercase(op.id) + '_ERROR'
   const actionComplete = camelToUppercase(op.id)
   const infoParam = isTs ? 'info?: any' : 'info'
   let paramSignature = renderParamSignature(op, options, `${op.group}.`)
@@ -53,7 +56,13 @@ function renderReduxActionBlock(spec: ApiSpec, op: ApiOperation, options: Client
   const returnType = response ? getTSParamType(response) : 'any'
   return `
 export const ${actionStart} = 's/${op.group}/${actionStart}'${ST}
+export const ${actionSuccess} = 's/${op.group}/${actionSuccess}'${ST}
+export const ${actionError} = 's/${op.group}/${actionError}'${ST}
 export const ${actionComplete} = 's/${op.group}/${actionComplete}'${ST}
+
+export const ${op.id}SuccessAction = createAction(${actionSuccess})
+export const ${op.id}ErrorAction = createAction(${actionError})
+
 ${isTs ? `export type ${actionComplete} = ${returnType}${ST}`: ''}
 
 export function ${op.id}(${paramSignature})${isTs? ': any' : ''} {
