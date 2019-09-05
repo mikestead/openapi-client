@@ -38,6 +38,7 @@ import * as ${name} from '../${name}'${ST}
 function renderReduxActionBlock(spec: ApiSpec, op: ApiOperation, options: ClientOptions): string {
   const lines = []
   const isTs = options.language === 'ts'
+  const actionRequest = 'REQUEST_' + camelToUppercase(op.id)
   const actionStart = camelToUppercase(op.id) + '_START'
   const actionSuccess = camelToUppercase(op.id) + '_SUCCESS'
   const actionError = camelToUppercase(op.id) + '_ERROR'
@@ -55,6 +56,7 @@ function renderReduxActionBlock(spec: ApiSpec, op: ApiOperation, options: Client
   const response = getBestResponse(op)
   const returnType = response ? getTSParamType(response) : 'any'
   return `
+export const ${actionRequest} = '${actionStart}'${ST}
 export const ${actionStart} = 's/${op.group}/${actionStart}'${ST}
 export const ${actionSuccess} = 's/${op.group}/${actionSuccess}'${ST}
 export const ${actionError} = 's/${op.group}/${actionError}'${ST}

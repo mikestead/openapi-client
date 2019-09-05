@@ -37,6 +37,7 @@ import * as ${name} from '../${name}'${support_1.ST}
 function renderReduxActionBlock(spec, op, options) {
     const lines = [];
     const isTs = options.language === 'ts';
+    const actionRequest = 'REQUEST_' + util_1.camelToUppercase(op.id);
     const actionStart = util_1.camelToUppercase(op.id) + '_START';
     const actionSuccess = util_1.camelToUppercase(op.id) + '_SUCCESS';
     const actionError = util_1.camelToUppercase(op.id) + '_ERROR';
@@ -55,6 +56,7 @@ function renderReduxActionBlock(spec, op, options) {
     const response = util_1.getBestResponse(op);
     const returnType = response ? support_1.getTSParamType(response) : 'any';
     return `
+export const ${actionRequest} = '${actionStart}'${support_1.ST}
 export const ${actionStart} = 's/${op.group}/${actionStart}'${support_1.ST}
 export const ${actionSuccess} = 's/${op.group}/${actionSuccess}'${support_1.ST}
 export const ${actionError} = 's/${op.group}/${actionError}'${support_1.ST}
