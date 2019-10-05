@@ -144,6 +144,7 @@ export function renderDestructuredParamSignature(op: ApiOperation, options: Clie
   const destructuredParams = funcParams.map(p => p[0]).join(', ')
 
   if (bare) return destructuredParams;
+  if (!destructuredParams) return;
   if (options.language === 'ts') return `{ ${destructuredParams} }: { ${signature} }`
   return `{ ${destructuredParams} }`
 }

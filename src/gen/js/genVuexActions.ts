@@ -50,16 +50,16 @@ function renderVuexActionBlock(spec: ApiSpec, op: ApiOperation, options: ClientO
   }
 
   return `
-async ${op.id}({ commit }, ${paramSignature})${isTs ? ': Promise<any>' : ''} {
-  const response = await ${op.group}.${op.id}(${params});
+  async ${op.id}({ commit }${paramSignature ? ', ' + paramSignature : ''})${isTs ? ': Promise<any>' : ''} {
+    const response = await ${op.group}.${op.id}(${params});
 
-  if (response.error) {
-    commit('${actionError}', { response, ${actionParamSignature} });
-  } else {
-    commit('${actionComplete}', { response, ${actionParamSignature} });
-  }
+    if (response.error) {
+      commit('${actionError}', { response${actionParamSignature ? ', ' + actionParamSignature : ''} });
+    } else {
+      commit('${actionComplete}', { response${actionParamSignature ? ', ' + actionParamSignature : ''} });
+    }
 
-  return response;
-},
+    return response;
+  },
 `.replace(/  /g, SP);
 }
