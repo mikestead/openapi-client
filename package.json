@@ -20,9 +20,6 @@
     "npm": ">=2.14.2"
   },
   "main": "dist/index.js",
-  "bin": {
-    "openapi": "dist/cli.js"
-  },
   "scripts": {
     "setup": "typings install",
     "prebuild": "npm run init",
