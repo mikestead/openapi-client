@@ -28,7 +28,7 @@ function renderDefinitions(spec: ApiSpec, options: ClientOptions): string[] {
   const isTs = (options.language === 'ts')
   const isolatedModules = (options.isolatedModules)
   const defs = spec.definitions || {}
-  const typeLines = isTs && !isolatedModules ? [`namespace api {`] : undefined
+  const typeLines = isTs && !isolatedModules ? [`namespace api {`] : []
   const docLines = []
   Object.keys(defs).forEach(name => {
     const def = defs[name]

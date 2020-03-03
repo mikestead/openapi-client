@@ -29,17 +29,13 @@ export function genOperationGroupFiles(spec: ApiSpec, operations: ApiOperation[]
 
 function renderHeader(name: string, spec: ApiSpec, options: ClientOptions): string[] {
   const lines = []
-  if (options.language === 'ts')
-    if (options.isolatedModules) {
-      lines.push(`import * as api from './types'${ST}`)
-    }
-    else if (spec.definitions) {
-      lines.push(`/// <reference path="types.ts"/>`)
-    }
+  if (spec.definitions && options.language === 'ts' && !options.isolatedModules)
+    lines.push(`/// <reference path="types.ts"/>`)
 
   lines.push(`/** @module ${name} */`)
   lines.push(`// Auto-generated, edits will be overwritten`)
   lines.push(`import * as gateway from './gateway'${ST}`)
+  options.isolatedModules && lines.push(`import * as api from './types'${ST}`)
   lines.push('')
   return lines
 }
