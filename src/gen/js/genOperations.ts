@@ -29,9 +29,14 @@ export function genOperationGroupFiles(spec: ApiSpec, operations: ApiOperation[]
 
 function renderHeader(name: string, spec: ApiSpec, options: ClientOptions): string[] {
   const lines = []
-  if (spec.definitions && options.language === 'ts') {
-    lines.push(`/// <reference path="types.ts"/>`)
-  }
+  if (options.language === 'ts')
+    if (options.isolatedModules) {
+      lines.push(`import * as api from './types'${ST}`)
+    }
+    else if (spec.definitions) {
+      lines.push(`/// <reference path="types.ts"/>`)
+    }
+
   lines.push(`/** @module ${name} */`)
   lines.push(`// Auto-generated, edits will be overwritten`)
   lines.push(`import * as gateway from './gateway'${ST}`)
@@ -100,7 +105,7 @@ function renderDocParam(param) {
   return `${DOC}@param {${getDocType(param)}} ${name} ${description}`
 }
 
-function renderDocReturn(op:ApiOperation): string {
+function renderDocReturn(op: ApiOperation): string {
   const response = getBestResponse(op)
   let description = response ? response.description || '' : ''
   description = description.trim().replace(/\n/g, `\n${DOC}${SP}`)
@@ -119,7 +124,7 @@ function renderOperationBlock(spec: ApiSpec, op: ApiOperation, options: ClientOp
 function renderOperationSignature(op: ApiOperation, options: ClientOptions): string[] {
   const paramSignature = renderParamSignature(op, options)
   const rtnSignature = renderReturnSignature(op, options)
-  return [ `export function ${op.id}(${paramSignature})${rtnSignature} {` ]
+  return [`export function ${op.id}(${paramSignature})${rtnSignature} {`]
 }
 
 export function renderParamSignature(op: ApiOperation, options: ClientOptions, pkg?: string): string {
@@ -265,8 +270,8 @@ function renderParamGroup(name: string, groupLines: string[], last: boolean): st
 }
 
 function renderRequestCall(op: ApiOperation, options: ClientOptions) {
-  const params = op.parameters.length ? ', parameters': ''
-  return [ `${SP}return gateway.request(${op.id}Operation${params})${ST}`, '}' ]
+  const params = op.parameters.length ? ', parameters' : ''
+  return [`${SP}return gateway.request(${op.id}Operation${params})${ST}`, '}']
 }
 
 function renderOperationParamType(spec: ApiSpec, op: ApiOperation, options: ClientOptions): string[] {
@@ -301,7 +306,7 @@ function renderOperationInfo(spec: ApiSpec, op: ApiOperation, options: ClientOpt
   if (hasBody && op.contentTypes.length) {
     lines.push(`${SP}contentTypes: ['${op.contentTypes.join("','")}'],`)
   }
-  lines.push(`${SP}method: '${op.method}'${op.security ? ',': ''}`)
+  lines.push(`${SP}method: '${op.method}'${op.security ? ',' : ''}`)
   if (op.security && op.security.length) {
     const secLines = renderSecurityInfo(op.security)
     lines.push(`${SP}security: [`)
@@ -318,11 +323,11 @@ function renderSecurityInfo(security: ApiOperationSecurity[]): string[] {
     const scopes = sec.scopes
     const secLines = []
     secLines.push(`${SP.repeat(2)}{`)
-    secLines.push(`${SP.repeat(3)}id: '${sec.id}'${scopes ? ',': ''}`)
+    secLines.push(`${SP.repeat(3)}id: '${sec.id}'${scopes ? ',' : ''}`)
     if (scopes) {
       secLines.push(`${SP.repeat(3)}scopes: ['${scopes.join(`', '`)}']`)
     }
-    secLines.push(`${SP.repeat(2)}}${i + 1 < security.length ? ',': ''}`)
+    secLines.push(`${SP.repeat(2)}}${i + 1 < security.length ? ',' : ''}`)
     return secLines
   }).reduce((a, b) => a.concat(b))
 }

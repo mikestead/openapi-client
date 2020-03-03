@@ -12,6 +12,7 @@ const args: any = program
   .option('--redux', 'True if wanting to generate redux action creators', process.env.OPEN_API_REDUX)
   .option('--semicolon', 'True if wanting to use a semicolon statement terminator', process.env.OPEN_API_SEMICOLON)
   .option('--indent <2|4|tab>', 'Indentation to use, defaults to 2 spaces', process.env.OPEN_API_INDENT)
+  .option('--isolatedModules', 'True if wanting to isolated modules with ts', process.env.OPEN_API_MODULES)
   .parse(process.argv)
 
 genCode(args).then(complete, error)
