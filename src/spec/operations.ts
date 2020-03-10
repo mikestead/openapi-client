@@ -82,8 +82,15 @@ function getOperationResponses(op: any): ApiOperationResponse[] {
 function getOperationSecurity(op: any, spec: any): ApiOperationSecurity[] {
   let security
 
-  if (op.security && op.security.length) {
-    security = op.security
+  if (op.security) {
+    if (op.security.length) {
+      security = op.security
+    }
+    else {
+      // Allow disabling security on specific endpoints
+      // if security is an empty array
+      return
+    }
   }
   else if (spec.security && spec.security.length) {
     security = spec.security
