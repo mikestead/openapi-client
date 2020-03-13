@@ -10,6 +10,17 @@ export default function genService(options: ClientOptions) {
 
 export function genServiceFile(options: ClientOptions) {
   const path = `${options.outDir}/gateway/index.${options.language}`
-  const contents = readFileSync(`${__dirname}/service.${options.language}.template`, 'utf8')
+  let contents = readFileSync(`${__dirname}/service.${options.language}.template`, 'utf8')
+
+  // when isolated modules options is set and true, add a import statement
+  // at the top of the service template
+  if (options.isolatedModules && options.isolatedModules === true) {
+    let lines = contents.split(/\r?\n/);
+    lines.splice(3, 0, 'import * as api from \'../types\'');
+
+    contents = "";
+    lines.forEach((line => contents += `${line}\n`));
+  }
+
   return  { path, contents }
 }

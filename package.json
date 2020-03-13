@@ -58,7 +58,7 @@
   "devDependencies": {
     "cross-env": "^1.0.7",
     "expect": "^1.20.1",
-    "mocha": "^2.5.3",
+    "mocha": "^7.1.0",
     "shx": "^0.1.2",
     "tslint": "^3.10.2",
     "typescript": "^1.8.10",
