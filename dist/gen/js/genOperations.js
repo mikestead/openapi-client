@@ -60,7 +60,13 @@ function renderOperationDocs(op) {
 }
 function renderDocDescription(op) {
     const desc = op.description || op.summary;
-    return desc ? `${support_1.DOC}${desc.trim()}`.replace(/\n/g, `\n${support_1.DOC}`).split('\n') : [];
+    return desc
+      ? `${support_1.DOC}${desc.trim()}`
+          .replace(/\/\*/g, '/ *')
+          .replace(/\*\//g, '* /')
+          .replace(/\n/g, `\n${support_1.DOC}`)
+          .split('\n')
+      : [];
 }
 function renderDocParams(op) {
     const params = op.parameters;

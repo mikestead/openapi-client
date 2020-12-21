@@ -63,7 +63,13 @@ function renderOperationDocs(op: ApiOperation): string[] {
 
 function renderDocDescription(op: ApiOperation) {
   const desc = op.description || op.summary
-  return desc ? `${DOC}${desc.trim()}`.replace(/\n/g, `\n${DOC}`).split('\n') : []
+  return desc
+    ? `${DOC}${desc.trim()}`
+        .replace(/\/\*/g, '/ *')
+        .replace(/\*\//g, '* /')
+        .replace(/\n/g, `\n${DOC}`)
+        .split('\n')
+    : [];
 }
 
 function renderDocParams(op: ApiOperation) {
