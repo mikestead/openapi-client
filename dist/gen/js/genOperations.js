@@ -61,12 +61,12 @@ function renderOperationDocs(op) {
 function renderDocDescription(op) {
     const desc = op.description || op.summary;
     return desc
-      ? `${support_1.DOC}${desc.trim()}`
-          .replace(/\/\*/g, '/ *')
-          .replace(/\*\//g, '* /')
-          .replace(/\n/g, `\n${support_1.DOC}`)
-          .split('\n')
-      : [];
+        ? `${support_1.DOC}${desc.trim()}`
+            .replace(/\/\*/g, '/ *')
+            .replace(/\*\//g, '* /')
+            .replace(/\n/g, `\n${support_1.DOC}`)
+            .split('\n')
+        : [];
 }
 function renderDocParams(op) {
     const params = op.parameters;
@@ -209,6 +209,14 @@ function escapeReservedWords(name) {
 }
 function renderOperationObject(spec, op, options) {
     const lines = [];
+    if (op.requestBody) {
+        op.parameters.push({
+            in: 'body',
+            name: 'body',
+            required: false,
+            schema: op.requestBody.content['application/json']
+        });
+    }
     const parameters = op.parameters.reduce(groupParams, {});
     const names = Object.keys(parameters);
     const last = names.length - 1;
@@ -292,7 +300,7 @@ function renderOperationInfo(spec, op, options) {
         lines.push(`const ${op.id}Operation = {`);
     }
     lines.push(`${support_1.SP}path: '${op.path}',`);
-    const hasBody = op.parameters.some(p => p.in === 'body');
+    const hasBody = op.requestBody;
     if (hasBody && op.contentTypes.length) {
         lines.push(`${support_1.SP}contentTypes: ['${op.contentTypes.join("','")}'],`);
     }

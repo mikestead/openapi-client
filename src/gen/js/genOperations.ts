@@ -220,6 +220,14 @@ function escapeReservedWords(name: string): string {
 
 function renderOperationObject(spec: ApiSpec, op: ApiOperation, options: ClientOptions): string[] {
   const lines = []
+  if(op.requestBody) {
+    op.parameters.push({
+      in: 'body',
+      name: 'body',
+      required: false,
+      schema: op.requestBody.content['application/json']
+    });
+  }
   const parameters = op.parameters.reduce(groupParams, {})
   const names = Object.keys(parameters)
   const last = names.length - 1
@@ -303,7 +311,7 @@ function renderOperationInfo(spec: ApiSpec, op: ApiOperation, options: ClientOpt
   }
   lines.push(`${SP}path: '${op.path}',`)
 
-  const hasBody = op.parameters.some(p => p.in === 'body')
+  const hasBody = op.requestBody
   if (hasBody && op.contentTypes.length) {
     lines.push(`${SP}contentTypes: ['${op.contentTypes.join("','")}'],`)
   }
