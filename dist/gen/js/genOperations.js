@@ -213,7 +213,7 @@ function renderOperationObject(spec, op, options) {
         op.parameters.push({
             in: 'body',
             name: 'body',
-            required: false,
+            required: true,
             schema: op.requestBody.content['application/json']
         });
     }

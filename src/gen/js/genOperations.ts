@@ -224,7 +224,7 @@ function renderOperationObject(spec: ApiSpec, op: ApiOperation, options: ClientO
     op.parameters.push({
       in: 'body',
       name: 'body',
-      required: false,
+      required: true,
       schema: op.requestBody.content['application/json']
     });
   }
