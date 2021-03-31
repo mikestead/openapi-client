@@ -7,14 +7,16 @@ export default function genOperations(spec: ApiSpec, operations: ApiOperation[],
 }
 
 export function genOperationGroupFiles(spec: ApiSpec, operations: ApiOperation[], options: ClientOptions) {
-  if (operations.requestBody) {
-    operations.parameters.push({
-      in: 'body',
-      name: 'body',
-      required: true,
-      schema: operations.requestBody.content['application/json'],
-    });
-  }
+  operations.forEach((op, index) => {
+    if (op.requestBody) {
+      operations[index].parameters.push({
+        in: 'body',
+        name: 'body',
+        required: true,
+        schema: operations[index].requestBody.content['application/json'],
+      });
+    }
+  })
   const groups = groupOperationsByGroupName(operations)
   const files = []
   for (let name in groups) {

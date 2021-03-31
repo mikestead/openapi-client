@@ -8,14 +8,16 @@ function genOperations(spec, operations, options) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = genOperations;
 function genOperationGroupFiles(spec, operations, options) {
-    if (operations.requestBody) {
-        operations.parameters.push({
-            in: 'body',
-            name: 'body',
-            required: true,
-            schema: operations.requestBody.content['application/json'],
-        });
-    }
+    operations.forEach((op, index) => {
+        if (op.requestBody) {
+            operations[index].parameters.push({
+                in: 'body',
+                name: 'body',
+                required: true,
+                schema: operations[index].requestBody.content['application/json'],
+            });
+        }
+    });
     const groups = util_1.groupOperationsByGroupName(operations);
     const files = [];
     for (let name in groups) {
