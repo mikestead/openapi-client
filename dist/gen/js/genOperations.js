@@ -8,6 +8,14 @@ function genOperations(spec, operations, options) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = genOperations;
 function genOperationGroupFiles(spec, operations, options) {
+    if (operations.requestBody) {
+        operations.parameters.push({
+            in: 'body',
+            name: 'body',
+            required: true,
+            schema: operations.requestBody.content['application/json'],
+        });
+    }
     const groups = util_1.groupOperationsByGroupName(operations);
     const files = [];
     for (let name in groups) {
@@ -209,14 +217,6 @@ function escapeReservedWords(name) {
 }
 function renderOperationObject(spec, op, options) {
     const lines = [];
-    if (op.requestBody) {
-        op.parameters.push({
-            in: 'body',
-            name: 'body',
-            required: true,
-            schema: op.requestBody.content['application/json']
-        });
-    }
     const parameters = op.parameters.reduce(groupParams, {});
     const names = Object.keys(parameters);
     const last = names.length - 1;

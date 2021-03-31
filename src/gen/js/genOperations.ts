@@ -7,6 +7,14 @@ export default function genOperations(spec: ApiSpec, operations: ApiOperation[],
 }
 
 export function genOperationGroupFiles(spec: ApiSpec, operations: ApiOperation[], options: ClientOptions) {
+  if (operations.requestBody) {
+    operations.parameters.push({
+      in: 'body',
+      name: 'body',
+      required: true,
+      schema: operations.requestBody.content['application/json'],
+    });
+  }
   const groups = groupOperationsByGroupName(operations)
   const files = []
   for (let name in groups) {
@@ -220,14 +228,6 @@ function escapeReservedWords(name: string): string {
 
 function renderOperationObject(spec: ApiSpec, op: ApiOperation, options: ClientOptions): string[] {
   const lines = []
-  if(op.requestBody) {
-    op.parameters.push({
-      in: 'body',
-      name: 'body',
-      required: true,
-      schema: op.requestBody.content['application/json']
-    });
-  }
   const parameters = op.parameters.reduce(groupParams, {})
   const names = Object.keys(parameters)
   const last = names.length - 1
