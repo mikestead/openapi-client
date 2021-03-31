@@ -28,18 +28,19 @@ interface ApiSpec {
 type HttpMethod = 'get'|'put'|'post'|'delete'|'options'|'head'|'patch'
 
 interface ApiOperation {
-  id: string
-  summary: string
-  description: string
-  method: HttpMethod
-  group: string
-  path: string
-  parameters: ApiOperationParam[]
-  responses: ApiOperationResponse[]
-  security?: ApiOperationSecurity[]
-  accepts: string[]
-  contentTypes: string[]
-  tags?: string[]
+  id: string;
+  summary: string;
+  description: string;
+  method: HttpMethod;
+  group: string;
+  path: string;
+  parameters: ApiOperationParam[];
+  responses: ApiOperationResponse[];
+  requestBody?: Object;
+  security?: ApiOperationSecurity[];
+  accepts: string[];
+  contentTypes: string[];
+  tags?: string[];
 }
 
 interface ApiOperationParam extends ApiOperationParamBase {

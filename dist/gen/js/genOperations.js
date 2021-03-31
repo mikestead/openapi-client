@@ -8,6 +8,16 @@ function genOperations(spec, operations, options) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = genOperations;
 function genOperationGroupFiles(spec, operations, options) {
+    operations.forEach((op, index) => {
+        if (op.requestBody) {
+            operations[index].parameters.push({
+                in: 'body',
+                name: 'body',
+                required: false,
+                schema: operations[index].requestBody.content['application/json'],
+            });
+        }
+    });
     const groups = util_1.groupOperationsByGroupName(operations);
     const files = [];
     for (let name in groups) {
@@ -61,12 +71,12 @@ function renderOperationDocs(op) {
 function renderDocDescription(op) {
     const desc = op.description || op.summary;
     return desc
-      ? `${support_1.DOC}${desc.trim()}`
-          .replace(/\/\*/g, '/ *')
-          .replace(/\*\//g, '* /')
-          .replace(/\n/g, `\n${support_1.DOC}`)
-          .split('\n')
-      : [];
+        ? `${support_1.DOC}${desc.trim()}`
+            .replace(/\/\*/g, '/ *')
+            .replace(/\*\//g, '* /')
+            .replace(/\n/g, `\n${support_1.DOC}`)
+            .split('\n')
+        : [];
 }
 function renderDocParams(op) {
     const params = op.parameters;
@@ -292,7 +302,7 @@ function renderOperationInfo(spec, op, options) {
         lines.push(`const ${op.id}Operation = {`);
     }
     lines.push(`${support_1.SP}path: '${op.path}',`);
-    const hasBody = op.parameters.some(p => p.in === 'body');
+    const hasBody = op.requestBody;
     if (hasBody && op.contentTypes.length) {
         lines.push(`${support_1.SP}contentTypes: ['${op.contentTypes.join("','")}'],`);
     }
