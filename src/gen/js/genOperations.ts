@@ -12,7 +12,7 @@ export function genOperationGroupFiles(spec: ApiSpec, operations: ApiOperation[]
       operations[index].parameters.push({
         in: 'body',
         name: 'body',
-        required: true,
+        required: false,
         schema: operations[index].requestBody.content['application/json'],
       });
     }

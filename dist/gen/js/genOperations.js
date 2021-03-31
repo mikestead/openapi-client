@@ -13,7 +13,7 @@ function genOperationGroupFiles(spec, operations, options) {
             operations[index].parameters.push({
                 in: 'body',
                 name: 'body',
-                required: true,
+                required: false,
                 schema: operations[index].requestBody.content['application/json'],
             });
         }
