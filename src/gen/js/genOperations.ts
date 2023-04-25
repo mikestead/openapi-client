@@ -45,6 +45,7 @@ function renderHeader(name: string, spec: ApiSpec, options: ClientOptions): stri
   lines.push(`/** @module ${name} */`)
   lines.push(`// Auto-generated, edits will be overwritten`)
   lines.push(`import * as gateway from './gateway'${ST}`)
+  lines.push(`import api from './types'${ST}`)
   lines.push('')
   return lines
 }

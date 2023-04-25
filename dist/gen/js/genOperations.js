@@ -8,16 +8,16 @@ function genOperations(spec, operations, options) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = genOperations;
 function genOperationGroupFiles(spec, operations, options) {
-    operations.forEach((op, index) => {
-        if (op.requestBody) {
-            operations[index].parameters.push({
-                in: 'body',
-                name: 'body',
-                required: false,
-                schema: operations[index].requestBody.content['application/json'],
-            });
-        }
-    });
+    // operations.forEach((op, index) => {
+    //   if (op.requestBody) {
+    //     operations[index].parameters.push({
+    //       in: 'body',
+    //       name: 'body',
+    //       required: false,
+    //       schema: operations[index].requestBody.content['application/json'],
+    //     });
+    //   }
+    // })
     const groups = util_1.groupOperationsByGroupName(operations);
     const files = [];
     for (let name in groups) {
@@ -45,6 +45,7 @@ function renderHeader(name, spec, options) {
     lines.push(`/** @module ${name} */`);
     lines.push(`// Auto-generated, edits will be overwritten`);
     lines.push(`import * as gateway from './gateway'${support_1.ST}`);
+    lines.push(`import api from './types'${support_1.ST}`);
     lines.push('');
     return lines;
 }

@@ -38,7 +38,7 @@ function renderDefinitions(spec, options) {
     });
     if (isTs) {
         util_1.join(typeLines, renderTsDefaultTypes());
-        typeLines.push('}');
+        typeLines.push('}\nexport default api');
     }
     return isTs ? typeLines.concat(docLines) : docLines;
 }
@@ -134,7 +134,15 @@ export interface OperationSecurity {
 export interface OperationParamGroups {
   header?: {[key: string]: string}${support_1.ST}
   path?: {[key: string]: string|number|boolean}${support_1.ST}
-  query?: {[key: string]: string|string[]|number|boolean}${support_1.ST}
+  query?: {[key: string]:      
+      | string
+      | string[]
+      | number
+      | number[]
+      | boolean
+      | boolean[]
+      | Date
+      | undefined}${support_1.ST}
   formData?: {[key: string]: string|number|boolean}${support_1.ST}
   body?: any${support_1.ST}
 }

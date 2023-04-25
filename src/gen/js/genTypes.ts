@@ -38,7 +38,7 @@ function renderDefinitions(spec: ApiSpec, options: ClientOptions): string[] {
   })
   if (isTs) {
     join(typeLines, renderTsDefaultTypes())
-    typeLines.push('}')
+    typeLines.push('}\nexport default api')
   }
   return isTs ? typeLines.concat(docLines) : docLines
 }
@@ -141,7 +141,15 @@ export interface OperationSecurity {
 export interface OperationParamGroups {
   header?: {[key: string]: string}${ST}
   path?: {[key: string]: string|number|boolean}${ST}
-  query?: {[key: string]: string|string[]|number|boolean}${ST}
+  query?: {[key: string]:      
+      | string
+      | string[]
+      | number
+      | number[]
+      | boolean
+      | boolean[]
+      | Date
+      | undefined}${ST}
   formData?: {[key: string]: string|number|boolean}${ST}
   body?: any${ST}
 }
